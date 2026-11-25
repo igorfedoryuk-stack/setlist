@@ -344,7 +344,10 @@ button.big{font-size:1rem;padding:12px 18px}
 .who-bar{display:flex;gap:6px;align-items:center;font-size:.82rem;color:var(--muted);flex-wrap:wrap}
 .who-bar b{color:var(--fg)}
 .who-bar button{padding:4px 8px;font-size:.78rem}
-.who-bar a.who-help{color:var(--accent);font-weight:600;font-size:.78rem}
+.help-link{position:absolute;top:14px;right:0;display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 5px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);text-decoration:none;font:600 .82rem/1 var(--f-body)}
+.help-link .q{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font:700 .85rem/1 var(--f-body)}
+.help-link:hover{border-color:var(--fg)}
+@media (max-width:520px){.help-link{padding:4px}.help-link .t{display:none}}
 </style>
 </head>
 <body>
@@ -380,7 +383,8 @@ button.big{font-size:1rem;padding:12px 18px}
         <h1 class="wm"><span class="wm-main">Strangers</span><span class="wm-sub">cover band · Kyiv · Ukraine</span></h1>
       </div>
       <p class="crew" id="crew" aria-label="Склад гурту"></p>
-      <span class="who-bar">Ти: <b id="who-name">—</b> <a href="guide.html" class="who-help">довідка</a> <button type="button" class="ghost" id="band-logout">вийти</button></span>
+      <a href="guide.html" class="help-link" aria-label="Довідка: як користуватися сайтом"><span class="q">?</span><span class="t">Довідка</span></a>
+      <span class="who-bar">Ти: <b id="who-name">—</b> <button type="button" class="ghost" id="band-logout">вийти</button></span>
     </div>
     <nav class="tabs" aria-label="Розділи">
       <a href="#songs" id="tab-songs">Пісні</a>

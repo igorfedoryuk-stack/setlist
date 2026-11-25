@@ -916,13 +916,13 @@ details.grp>.gb .grid{margin-top:0}
   const rateOf=s=>{const r=Number(s.rating||0); return r>=1&&r<=5?r:0};
   const starsHtml=r=>r?`<span class="stars" aria-label="Готовність ${r} з 5"><b>${"★".repeat(r)}</b><span>${"★".repeat(5-r)}</span></span>`:`<span class="stars muted">без оцінки</span>`;
   const VOCALISTS=["Саша","Олексій","Алінка","Іванка"];
-  const BAND=[{email:"alina.cheremys@gmail.com",name:"Алінка",role:"Вокал"},{email:"igor.fedoryuk@gmail.com",name:"Ігор",role:"Соло електрогітара"},{email:"nogacrab@gmail.com",name:"Аня",role:"Клавіші"},{email:"5739422@gmail.com",name:"Емілія",role:"Бас-гітара"}];
-  const roleByEmail=e=>{const m=BAND.find(b=>b.email===String(e||"").toLowerCase()); return m?m.role:"";};
-  const roleByName=n=>{const m=BAND.find(b=>b.name===n); return m?m.role:"";};
+  const BAND=[{email:"alina.cheremys@gmail.com",name:"Алінка",role:"Вокал"},{email:"igor.fedoryuk@gmail.com",name:"Ігор",role:"Соло електрогітара"},{email:"nogacrab@gmail.com",name:"Аня",role:"Клавіші"},{email:"5739422@gmail.com",name:"Емілія",role:"Бас-гітара"},{email:"",name:"Олексій",full:"Олексій Серкутан",role:"Вокал"}];
+  const roleByEmail=e=>{e=String(e||"").toLowerCase(); if(!e) return ""; const m=BAND.find(b=>b.email&&b.email===e); return m?m.role:"";};
+  const roleByName=n=>{n=String(n||"").trim(); if(!n) return ""; const m=BAND.find(b=>b.name===n||b.full===n||n.startsWith(b.name+" ")); return m?m.role:"";};
   let myEmail=null, bandProf={}, cmtEmails={};
   const roleOf=a=>roleByEmail(cmtEmails[a]||(a===me?myEmail:null))||roleByName(a);
   function renderCrew(){
-    $("#crew").innerHTML=BAND.map(b=>{const p=bandProf[b.email], nm=(p&&p.name)||b.name, isMe=!!myEmail&&myEmail.toLowerCase()===b.email;
+    $("#crew").innerHTML=BAND.map(b=>{const p=bandProf[b.email], nm=(p&&p.name)||b.name, isMe=(!!myEmail&&!!b.email&&myEmail.toLowerCase()===b.email)||(!b.email&&!!me&&(me===b.name||me===b.full));
       return `<span class="m">${p&&p.avatarUrl?`<img src="${esc(p.avatarUrl)}" alt="">`:""}<b>${esc(nm)}</b>${isMe?'<span class="muted">(ти)</span>':""}<span class="role">${esc(b.role)}</span></span>`;}).join("");
   }
   async function loadCrew(){

@@ -99,7 +99,8 @@
   const user = {
     async can() { return true; }, canEdit() { return true; }, isOwner() { return true; },
     async id() { return myName(); },
-    async me() { return { id: myName(), name: myName() }; },
+    async me() { return { id: myName(), name: myName(), email: ME.email }; },
+    async search() { return []; },
     async profiles(ids) { const o = {}; (ids || []).forEach(i => { o[i] = { id: i, name: i }; }); return o; }
   };
 

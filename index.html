@@ -1,0 +1,1651 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Сетлист гурту</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23c4471c'/%3E%3Cpath d='M12 23V9l10-2v13' stroke='%23fff' stroke-width='2.4' fill='none'/%3E%3Ccircle cx='9.5' cy='23' r='3' fill='%23fff'/%3E%3Ccircle cx='19.5' cy='20' r='3' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+/* Layout: one column "setlist on the stage floor" — numbered running order, then a song card; setup is a long reference sheet with a chip index. */
+:root{
+  --bg:#f1f2ee; --surface:#fbfbf8; --line:#d8dbd2; --fg:#1b1e1b; --muted:#636a62;
+  --accent:#c4471c; --accent-soft:#f6e3d9; --ok:#2e7d4f; --warn:#a2650b;
+  --chip:#e6e9e1;
+  --r1:#c8352b; --r2:#d9772a; --r3:#c9a227; --r4:#7aa83a; --r5:#2e8b57;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141614; --surface:#1c1f1c; --line:#30352f; --fg:#e8ebe4; --muted:#9aa197;
+  --accent:#ff7d4a; --accent-soft:#3a2219; --ok:#5fc28a; --warn:#e0a548; --chip:#262a25;
+  --r1:#ef5a4c; --r2:#f08a3e; --r3:#e2c04a; --r4:#93c955; --r5:#4fc184; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141614; --surface:#1c1f1c; --line:#30352f; --fg:#e8ebe4; --muted:#9aa197;
+  --accent:#ff7d4a; --accent-soft:#3a2219; --ok:#5fc28a; --warn:#e0a548; --chip:#262a25;
+  --r1:#ef5a4c; --r2:#f08a3e; --r3:#e2c04a; --r4:#93c955; --r5:#4fc184; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:960px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 20px;padding-block:18px 10px}
+h1{font:700 2.1rem/1 var(--f-display);letter-spacing:.01em;margin:0;text-transform:uppercase}
+h1 small{display:block;font:500 .78rem/1.3 var(--f-body);letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+nav.tabs{display:flex;gap:4px}
+nav.tabs a{font:600 1.05rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-decoration:none;padding:9px 14px;border-radius:6px}
+nav.tabs a[aria-current="page"]{background:var(--fg);color:var(--bg)}
+nav.tabs a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font:700 1.5rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:0;text-wrap:balance}
+h3{font:600 1.15rem/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.04em;margin:0}
+.muted{color:var(--muted)}
+.note{font-size:.85rem;color:var(--muted)}
+button,.btn{font:600 .9rem/1 var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:9px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+button:hover,.btn:hover{border-color:var(--muted)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+button.danger{color:var(--accent);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+textarea{resize:vertical}
+label.f{display:grid;gap:4px;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:0}
+label.f > *{text-transform:none;letter-spacing:0;font-size:.95rem}
+.banner{border:1px dashed var(--line);border-radius:8px;padding:14px 16px;margin-top:16px;background:var(--surface)}
+/* Songs list */
+.listbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 6px}
+.listbar .grow{flex:1}
+.badge{font:600 .72rem/1 var(--f-mono);background:var(--accent);color:#fff;border-radius:999px;padding:3px 7px}
+.filters{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px;margin-top:4px;display:grid;gap:10px}
+.toolbar{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:end}
+.toolbar2{display:grid;grid-template-columns:2fr 1fr auto auto;gap:8px;align-items:end}
+@media (max-width:720px){.toolbar,.toolbar2{grid-template-columns:1fr 1fr}.toolbar .search,.toolbar2 .sortf{grid-column:1/-1}}
+.count{font-size:.82rem;color:var(--muted);margin:10px 0 10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+ol.set{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.row{--rc:var(--line);display:grid;grid-template-columns:44px minmax(0,1fr) auto auto auto;align-items:center;gap:12px;padding:10px 8px 10px 6px;border:1px solid var(--line);border-left:6px solid var(--rc);border-radius:8px;cursor:pointer;background:var(--surface)}
+.row.r1{--rc:var(--r1)}.row.r2{--rc:var(--r2)}.row.r3{--rc:var(--r3)}.row.r4{--rc:var(--r4)}.row.r5{--rc:var(--r5)}
+.row[class*=" r"]{background:color-mix(in srgb,var(--rc) 13%,var(--surface))}
+.row:hover{border-color:var(--muted);border-left-color:var(--rc)}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.8rem;color:var(--muted);margin-top:3px}
+.meta .stale{color:var(--accent);font-weight:600}
+.bpm{font:700 1.3rem/1 var(--f-display);text-align:right;font-variant-numeric:tabular-nums;min-width:3.2em}
+.bpm small{display:block;font:600 .62rem/1.2 var(--f-mono);color:var(--muted);letter-spacing:.06em}
+.bpm.none{color:var(--muted);font-weight:500}
+.ib{font:600 .76rem/1 var(--f-body);display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:5px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+.ib svg{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ib:hover{border-color:var(--muted)}
+.ib .cnt{font:700 .7rem/1 var(--f-mono);background:var(--accent);color:#fff;border-radius:999px;padding:2px 5px}
+.ib.empty{color:var(--muted)}
+.ib.reh[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.row.on-reh .num{color:var(--accent)}
+.reh-tag{font:600 .7rem/1 var(--f-mono);text-transform:uppercase;color:var(--accent);letter-spacing:.04em}
+.lyrics{white-space:pre-wrap;font-size:1.05rem;line-height:1.65;margin:0;max-width:60ch}
+.cmts{display:grid;gap:8px}
+.cmt{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface);display:grid;gap:4px}
+.cmt header{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.cmt header b{color:var(--fg);font-size:.88rem}
+.cmt p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.cmt .ghost{margin-left:auto;padding:3px 6px;font-size:.78rem}
+.cmt-form{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.savebar .back{order:-1}
+.prac{display:flex;flex-direction:column;align-items:center;gap:2px;font:600 .66rem/1.1 var(--f-mono);color:var(--muted);text-transform:uppercase;cursor:pointer;padding:4px}
+.prac input{width:22px;height:22px;accent-color:var(--ok);cursor:pointer;margin:0}
+.stars{display:inline-flex;gap:2px;font-size:.85rem;letter-spacing:0}
+.stars b{color:var(--rc)}.stars span{color:var(--line)}
+.rate{display:flex;gap:4px;flex-wrap:wrap}
+.rate button{min-width:44px;justify-content:center;font:700 1rem/1 var(--f-display)}
+.rate button[aria-pressed="true"]{color:#fff;border-color:transparent}
+.rate button.v1[aria-pressed="true"]{background:var(--r1)}.rate button.v2[aria-pressed="true"]{background:var(--r2)}.rate button.v3[aria-pressed="true"]{background:var(--r3)}.rate button.v4[aria-pressed="true"]{background:var(--r4)}.rate button.v5[aria-pressed="true"]{background:var(--r5)}
+.practice{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.practice .big{font:700 1.8rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.practice label{display:flex;gap:8px;align-items:center;font-weight:600;cursor:pointer}
+.practice input{width:22px;height:22px;accent-color:var(--ok)}
+.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.lnk{font:600 .76rem/1 var(--f-body);display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:5px;border:1px solid var(--line);background:var(--bg);color:var(--fg);text-decoration:none}
+.lnk:hover{border-color:var(--muted)}
+.lnk .ic{font-size:.7rem;color:var(--accent)}
+.media{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.media .acts{display:flex;gap:6px;flex-wrap:wrap}
+/* Presets */
+article.ref.wide{max-width:none}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px}
+.pcard{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 14px;display:grid;gap:8px;align-content:start;min-width:0}
+.pcard header{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pcard .slot{font:700 .82rem/1 var(--f-mono);background:var(--fg);color:var(--bg);padding:5px 7px;border-radius:4px}
+.pcard .pname{font:700 1.35rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;flex:1;min-width:0;overflow-wrap:anywhere}
+.pcard dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 10px;margin:0;font-size:.86rem}
+.pcard dt{font:600 .7rem/1.7 var(--f-mono);text-transform:uppercase;color:var(--muted)}
+.pcard dd{margin:0;overflow-wrap:anywhere}
+.pcard .used{font-size:.8rem;color:var(--muted)}
+.pform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pform .w{grid-column:1/-1}
+.pform .row-acts{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* Learn */
+.lcat{display:grid;gap:12px;margin-top:30px;max-width:820px}
+.lcat .sub{margin:0;color:var(--muted);font-size:.9rem}
+.items{display:grid;gap:6px}
+.item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.item .kind{font:600 .7rem/1 var(--f-mono);text-transform:uppercase;padding:5px 6px;border-radius:4px;background:var(--chip)}
+.item .kind.pdf{background:var(--accent-soft);color:var(--accent)}
+.item b{display:block;font-weight:600;overflow-wrap:anywhere}
+.item b a{color:var(--fg)}
+.item small{color:var(--muted);overflow-wrap:anywhere}
+.item .acts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.addform{display:grid;grid-template-columns:2fr 2fr auto;gap:8px;align-items:end;padding:12px;border:1px dashed var(--line);border-radius:8px}
+.addform .w{grid-column:1/-1}
+@media (max-width:640px){.addform{grid-template-columns:1fr}.item{grid-template-columns:minmax(0,1fr) auto}.item .kind{grid-column:1/-1;justify-self:start}}
+.num{font:700 1.7rem/1 var(--f-display);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.ttl{min-width:0}
+.ttl b{display:block;font:600 1.25rem/1.15 var(--f-display);letter-spacing:.01em;overflow-wrap:anywhere}
+.ttl span{font-size:.85rem;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}
+.tag{font:600 .74rem/1 var(--f-mono);padding:5px 7px;border-radius:4px;background:var(--chip);white-space:nowrap}
+.tag.preset{background:var(--fg);color:var(--bg)}
+.tag.drop{background:var(--accent-soft);color:var(--accent)}
+.tag.voc{background:color-mix(in srgb,var(--accent) 14%,var(--surface));color:var(--fg)}
+.vocs{display:flex;flex-wrap:wrap;gap:6px}
+.tag.shift{border:1px solid var(--warn);color:var(--warn);background:transparent}
+.mv{display:flex;flex-direction:column;gap:2px}
+.mv button{padding:3px 8px;font-size:.8rem}
+@media (max-width:640px){.row{grid-template-columns:30px minmax(0,1fr) auto auto;gap:8px}.row .tags{grid-column:2/-1;grid-row:2;justify-content:flex-start}.row .mv{grid-row:1/3;grid-column:5}.row .bpm{grid-column:3}.row .prac{grid-column:4}.num{font-size:1.4rem}}
+/* Song card */
+.card-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin:18px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.grid .w2{grid-column:span 2}.grid .w4{grid-column:1/-1}
+@media (max-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid .w2,.grid .w4{grid-column:1/-1}}
+section.block{margin-top:26px;display:grid;gap:10px}
+.block-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:2px solid var(--fg);padding-bottom:6px}
+.part{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr) auto;gap:8px;align-items:start;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.part textarea.chords{font-family:var(--f-mono);font-size:.92rem;min-height:2.6em}
+.part .pnote{grid-column:2/3}
+.part .ctrl{display:flex;gap:4px;grid-row:1/3;grid-column:3}
+.part .ctrl button{padding:5px 8px}
+@media (max-width:560px){.part{grid-template-columns:minmax(0,1fr) auto}.part .pnote,.part textarea.chords{grid-column:1/-1}.part .ctrl{grid-row:1;grid-column:2}}
+.pdfs{display:grid;gap:6px}
+.pdf{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);flex-wrap:wrap}
+.pdf a{color:var(--fg);font-weight:600;overflow-wrap:anywhere}
+.savebar{position:sticky;bottom:0;margin-top:22px;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.status{font-size:.85rem;color:var(--muted)}
+.status.ok{color:var(--ok)}.status.err{color:var(--accent)}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--accent);border-radius:8px}
+/* Setup */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 4px}
+.chips button{font:600 .95rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.05em;border-radius:999px;padding:8px 14px}
+article.ref{display:grid;gap:12px;margin-top:30px;max-width:72ch}
+article.ref p,article.ref li{margin:0}
+article.ref ol,article.ref ul{margin:0;padding-left:1.3em;display:grid;gap:6px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:12px 14px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 8px 8px 0}
+.kv dt{font:600 .78rem/1.6 var(--f-mono);text-transform:uppercase;color:var(--muted)}
+.kv dd{margin:0}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+.chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}
+.node{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;min-width:0}
+.node b{display:block;font:600 1rem/1.15 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.node span{font-size:.8rem;color:var(--muted)}
+.node.amp{border-color:var(--fg)}
+.node.me{border-color:var(--accent)}
+.jack{align-self:center;font:600 .72rem/1.2 var(--f-mono);color:var(--accent);text-align:center}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:.86rem;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
+th{font:600 .74rem/1.3 var(--f-mono);text-transform:uppercase;color:var(--muted);background:var(--surface)}
+td.wrap{white-space:normal;min-width:16ch}
+tr:last-child td{border-bottom:0}
+@media (prefers-reduced-motion:no-preference){.row,button{transition:background-color .12s,border-color .12s}}
+nav.tabs{flex-wrap:wrap}
+@media (max-width:520px){nav.tabs a{padding:8px 9px;font-size:.95rem}}
+.chips .cheat-btn{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+/* Trainer */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;padding:3px;background:var(--surface);gap:2px;margin-top:18px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;font:600 1.05rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.05em;padding:10px 16px;border-radius:7px;color:var(--muted)}
+.seg button[aria-selected="true"]{background:var(--accent);color:#fff}
+.tr-head{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between;margin-top:14px}
+.tr-common{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+.tr-common label.f{width:170px}
+.tr-panel{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);display:grid;gap:10px}
+.tr-panel .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,200px));gap:8px}
+@media (max-width:720px){.tr-panel .grid3{grid-template-columns:repeat(2,minmax(0,1fr))}.tr-common label.f{width:calc(50% - 4px)}}
+.tr-score{display:flex;gap:16px;align-items:end;flex-wrap:wrap}
+.tr-score span{display:grid;text-align:center}
+.tr-score b{font:700 1.8rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.tr-score small{font:600 .66rem/1.3 var(--f-mono);text-transform:uppercase;color:var(--muted)}
+.pick{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pick .lbl{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.pick .ghost{font-size:.82rem}
+.sbtn{font:600 .88rem/1 var(--f-mono);min-width:48px;justify-content:center;padding:8px 10px}
+.sbtn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tr-hint{margin:0}
+.task{margin-top:14px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 20px;align-items:center}
+@media (max-width:640px){.task{grid-template-columns:1fr}}
+.task-text{display:grid;gap:4px;min-width:0}
+.task-kicker{font:600 .72rem/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.task-text b{font:700 1.6rem/1.15 var(--f-display);letter-spacing:.01em;text-wrap:balance}
+.task-text .nt{color:var(--accent)}
+.task-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+button.big{font-size:1rem;padding:12px 18px}
+.t-result{grid-column:1/-1;margin:0;padding:10px 12px;border-radius:8px;font-weight:600}
+.t-result.ok{background:color-mix(in srgb,var(--ok) 16%,var(--surface));color:var(--ok)}
+.t-result.err{background:var(--accent-soft);color:var(--accent)}
+.t-result small{display:block;font-weight:400;color:var(--fg);margin-top:3px}
+.fb-wrap{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px 8px 4px;-webkit-overflow-scrolling:touch}
+.fb{--cw:44px;display:grid;grid-template-columns:34px var(--cw) repeat(24,var(--cw));min-width:calc(34px + 25*var(--cw));position:relative}
+@media (max-width:640px){.fb{--cw:40px}}
+.fb .lab{font:600 .78rem/1 var(--f-mono);color:var(--muted);display:flex;align-items:center;justify-content:center;height:40px}
+.fb .lab.active{color:var(--accent)}
+.fb .cell{height:40px;position:relative;display:flex;align-items:center;justify-content:center;border-right:2px solid color-mix(in srgb,var(--muted) 55%,transparent)}
+.fb .cell::before{content:"";position:absolute;left:0;right:0;top:50%;height:var(--sw,1px);background:color-mix(in srgb,var(--fg) 55%,transparent);transform:translateY(-50%)}
+.fb .cell.open{border-right:6px solid var(--fg)}
+.fb .cell.inlay{background:color-mix(in srgb,var(--muted) 9%,transparent)}
+.fb .dot{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;border:2px solid color-mix(in srgb,var(--muted) 60%,transparent);background:var(--surface);cursor:pointer;padding:0;font:700 .62rem/1 var(--f-mono);color:transparent;display:flex;align-items:center;justify-content:center}
+.fb .dot:hover:not(:disabled){border-color:var(--fg)}
+.fb .dot:disabled{opacity:.18;cursor:default}
+.fb .row-off .dot{opacity:.18}
+.fb .dot.sel{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.fb .dot.root{background:var(--accent);border-color:var(--accent);color:#fff;opacity:1}
+.fb .dot.good{background:var(--ok);border-color:var(--ok);color:#fff}
+.fb .dot.bad{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 3px var(--accent-soft)}
+.fb .dot.miss{border:3px dashed var(--ok);color:var(--ok);background:var(--surface);opacity:1}
+.fb .fnum{font:600 .72rem/1 var(--f-mono);color:var(--muted);text-align:center;padding:6px 0 2px;font-variant-numeric:tabular-nums}
+.fb .fnum.mk{color:var(--fg)}
+.fb .fnum.mk::after{content:" •";color:var(--accent)}
+.fb .fnum.mk2::after{content:" ••";color:var(--accent)}
+.fb .cell .dot.root{opacity:1!important}
+.legend2{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem;color:var(--muted);margin:6px 0 0}
+.legend2 i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-2px}
+[hidden]{display:none!important}
+/* Modal */
+.modal{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,#000 55%,transparent);display:flex;align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.modal-box{background:var(--bg);color:var(--fg);border-radius:12px;width:min(920px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line)}
+.modal-head{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.modal-head .grow{flex:1}
+.modal-body{overflow:auto;padding:16px 20px 24px;display:grid;gap:12px}
+.cs h3{margin-top:10px}
+.cs p,.cs ul,.cs ol{margin:0}
+.cs ul,.cs ol{padding-left:1.3em;display:grid;gap:4px}
+.cs textarea{min-height:40vh;font-family:var(--f-mono);font-size:.88rem}
+.cs-sheet{margin:0;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.cs-sheet img{display:block;width:100%;height:auto}
+#band-gate{position:fixed;inset:0;z-index:80;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));overflow:auto}
+.gate-box{width:min(420px,100%);display:grid;gap:14px}
+.gate-box form{display:grid;gap:10px}
+.gate-msg{margin:0;color:var(--accent);font-weight:600}
+.who-bar{display:flex;gap:6px;align-items:center;font-size:.82rem;color:var(--muted);flex-wrap:wrap}
+.who-bar b{color:var(--fg)}
+.who-bar button{padding:4px 8px;font-size:.78rem}
+</style>
+</head>
+<body>
+<div id="band-gate" hidden>
+  <div class="gate-box">
+    <h1><small>Любительський гурт</small>Сетлист гурту</h1>
+    <p class="gate-msg" id="gate-msg" hidden></p>
+    <div id="gate-wait"><p class="muted">Перевіряю вхід…</p></div>
+    <div id="gate-login" hidden style="display:grid;gap:12px">
+      <p>Сайт відкритий лише для учасників гурту. Увійди через свій Google-акаунт.</p>
+      <button type="button" class="primary big" id="gate-google">Увійти через Google</button>
+    </div>
+    <div id="gate-denied" hidden style="display:grid;gap:12px">
+      <h2>Немає доступу</h2>
+      <p>Акаунт <b id="gate-email"></b> не входить до списку учасників гурту. Попроси власника сайту додати цю пошту або увійди іншим акаунтом.</p>
+      <button type="button" id="gate-other-account">Увійти іншим акаунтом</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <div style="display:grid;gap:6px"><h1><small>ESP LTD EC-256 · Boss ME-90</small>Сетлист гурту</h1>
+      <span class="who-bar">Ти: <b id="who-name">—</b> <button type="button" class="ghost" id="band-logout">вийти</button></span></div>
+    <nav class="tabs" aria-label="Розділи">
+      <a href="#songs" id="tab-songs">Пісні</a>
+      <a href="#learn" id="tab-learn">Навчання</a>
+      <a href="#trainer" id="tab-trainer">Тренажер</a>
+      <a href="#setup" id="tab-setup">Налаштування</a>
+    </nav>
+  </header>
+
+  <main id="view-songs">
+    <div id="list-view">
+      <div class="listbar">
+        <button type="button" id="toggle-filters" aria-expanded="false" aria-controls="filters">Фільтри і сортування <span class="badge" id="fcount" hidden></span></button>
+        <span class="grow"></span>
+        <button class="primary" id="add-song" type="button">+ Пісня</button>
+      </div>
+      <section class="filters" id="filters" hidden>
+        <div class="toolbar">
+          <label class="f search">Пошук<input id="q" type="search" placeholder="Назва або виконавець"></label>
+          <label class="f">Стрій<select id="f-tuning"><option value="">Усі</option><option value="E">E</option><option value="Drop D">Drop D</option><option value="__other">Інший</option></select></label>
+          <label class="f">Пресет<select id="f-preset"><option value="">Усі</option></select></label>
+          <label class="f">Тональність<select id="f-key"><option value="">Усі</option><option value="0">Оригінал (0)</option><option value="shifted">Змінена</option></select></label>
+          <label class="f">Готовність<select id="f-rate"><option value="">Усі</option><option value="low">1–2: слабко</option><option value="3">3: середньо</option><option value="high">4–5: готові</option><option value="none">Без оцінки</option></select></label>
+          <label class="f">Вокаліст<select id="f-voc"></select></label>
+          <label class="f">Репетиція<select id="f-reh"><option value="">Усі пісні</option><option value="yes">Плануємо грати</option><option value="no">Не в плані</option></select></label>
+        </div>
+        <div class="toolbar2">
+          <label class="f sortf">Сортування<select id="sort">
+            <option value="order">За порядком сетлиста</option>
+            <option value="practice">Найменше тренувань</option>
+            <option value="stale">Найдовше без тренування</option>
+            <option value="rate-asc">Найгірше готові</option>
+            <option value="rate-desc">Найкраще готові</option>
+            <option value="bpm">За BPM</option>
+            <option value="voc">За вокалістом</option>
+          </select></label>
+          <span></span>
+          <span id="reh-clear-wrap"><button type="button" class="ghost" id="reh-clear">Очистити план репетиції</button></span>
+          <button type="button" class="ghost" id="reset-filters">Скинути</button>
+        </div>
+      </section>
+      <div class="count"><span id="count">Завантажую пісні…</span>
+        <span class="legend" aria-label="Готовність"><span><i style="background:var(--r1)"></i>1</span><span><i style="background:var(--r2)"></i>2</span><span><i style="background:var(--r3)"></i>3</span><span><i style="background:var(--r4)"></i>4</span><span><i style="background:var(--r5)"></i>5 готова</span></span>
+      </div>
+      <p class="note" id="reorder-hint" hidden>Стрілки порядку з'являються, коли сортування «За порядком сетлиста» і фільтри скинуті.</p>
+      <ol class="set" id="songs"></ol>
+      <div class="banner" id="empty" hidden>
+        <h3>Сетлист порожній</h3>
+        <p class="muted">Якщо переносиш дані зі старої сторінки, відкрий «Налаштування → Дані сайту» і завантаж файл. Або додай першу пісню кнопкою «+ Пісня». Для кожної можна вказати стрій, BPM, пресет ME-90, структуру з акордами і прикріпити ноти в PDF.</p>
+      </div>
+    </div>
+
+    <div id="card-view" hidden></div>
+  </main>
+
+  <main id="view-learn" hidden>
+    <div class="chips">
+      <button type="button" data-jump="l-warmup">Розминка</button>
+      <button type="button" data-jump="l-technique">Техніка</button>
+      <button type="button" data-jump="l-theory">Теорія</button>
+      <button type="button" class="cheat-btn" id="open-cheat" aria-haspopup="dialog">Шпаргалка музиканта</button>
+    </div>
+    <p class="note" id="learn-status">Завантажую матеріали…</p>
+    <div id="learn-cats"></div>
+  </main>
+
+  <main id="view-trainer" hidden>
+    <div class="seg" role="tablist" aria-label="Вид тренування">
+      <button type="button" role="tab" data-kind="notes" aria-selected="true">Ноти</button>
+      <button type="button" role="tab" data-kind="intervals" aria-selected="false">Інтервали</button>
+      <button type="button" role="tab" data-kind="chords" aria-selected="false">Акорди</button>
+    </div>
+
+    <section class="tr-head">
+      <div class="tr-common">
+        <label class="f">Стрій<select id="t-tuning">
+          <option value="E">E стандарт</option>
+          <option value="D">Drop D</option>
+        </select></label>
+        <label class="f">Лади<select id="t-range">
+          <option value="24">0–24, увесь гриф</option>
+          <option value="12">0–12, до 12-го ладу</option>
+        </select></label>
+        <label class="f">Ноти<select id="t-notes">
+          <option value="nat">Лише основні (C D E F G A B)</option>
+          <option value="all">Разом з ♯/♭</option>
+        </select></label>
+      </div>
+      <div class="tr-score" aria-live="polite">
+        <span><b id="t-ok">0</b><small>правильно</small></span>
+        <span><b id="t-bad">0</b><small>з помилками</small></span>
+        <span><b id="t-streak">0</b><small>поспіль</small></span>
+        <button type="button" class="ghost" id="t-reset">Скинути рахунок</button>
+      </div>
+    </section>
+
+    <section class="tr-panel" id="p-notes">
+      <div class="grid3">
+        <label class="f">Складність<select id="t-mode">
+          <option value="one">Одна струна</option>
+          <option value="some">Кілька струн (2–3)</option>
+          <option value="all">Увесь гриф</option>
+        </select></label>
+      </div>
+      <div class="pick" role="group" aria-label="Струни для тренування">
+        <span class="lbl">Струни</span>
+        <span id="t-strings" class="pick"></span>
+        <button type="button" class="ghost" id="t-str-all">Усі</button>
+        <button type="button" class="ghost" id="t-str-low">Басові 4–6</button>
+        <button type="button" class="ghost" id="t-str-high">Тонкі 1–3</button>
+      </div>
+      <p class="note tr-hint" id="t-str-hint"></p>
+    </section>
+
+    <section class="tr-panel" id="p-intervals" hidden>
+      <div class="grid3">
+        <label class="f">Напрям<select id="i-dir">
+          <option value="up">Вгору від ноти</option>
+          <option value="down">Вниз від ноти</option>
+          <option value="both">Вгору і вниз</option>
+        </select></label>
+        <label class="f">Ноти від яких будувати<select id="i-root">
+          <option value="low">На басових струнах 4–6</option>
+          <option value="any">На будь-якій струні</option>
+        </select></label>
+      </div>
+      <div class="pick" role="group" aria-label="Інтервали">
+        <span class="lbl">Інтервали</span>
+        <span id="i-list" class="pick"></span>
+        <button type="button" class="ghost" id="i-all">Усі</button>
+        <button type="button" class="ghost" id="i-basic">Терції, кварта, квінта, октава</button>
+      </div>
+      <p class="note tr-hint">Познач одну ноту на <b>іншій струні</b>: на тій самій струні інтервал не будується. Корінь підсвічений помаранчевим.</p>
+    </section>
+
+    <section class="tr-panel" id="p-chords" hidden>
+      <div class="grid3">
+        <label class="f">Корінь на струні<select id="c-root">
+          <option value="65">6 або 5</option>
+          <option value="654">6, 5 або 4</option>
+          <option value="6">Лише 6</option>
+          <option value="5">Лише 5</option>
+        </select></label>
+        <label class="f">Положення<select id="c-bass">
+          <option value="root">Корінь — найнижча нота</option>
+          <option value="any">Можна обернення</option>
+        </select></label>
+      </div>
+      <div class="pick" role="group" aria-label="Типи акордів">
+        <span class="lbl">Акорди</span>
+        <span id="c-list" class="pick"></span>
+        <button type="button" class="ghost" id="c-all">Усі</button>
+        <button type="button" class="ghost" id="c-triads">Мажор і мінор</button>
+      </div>
+      <p class="note tr-hint">Корінь уже стоїть на грифі. Добудуй решту звуків акорду: на кожній струні — не більше однієї ноти, повтори звуків дозволені. Струни можна не використовувати всі.</p>
+    </section>
+
+    <section class="task" id="t-task">
+      <div class="task-text" id="t-text"></div>
+      <div class="task-acts">
+        <button type="button" class="primary big" id="t-start">Почати тренування</button>
+        <button type="button" class="primary big" id="t-check" hidden>Перевірити</button>
+        <button type="button" class="primary big" id="t-next" hidden>Наступне завдання →</button>
+        <button type="button" class="ghost" id="t-clear" hidden>Очистити</button>
+        <button type="button" class="ghost" id="t-stop" hidden>Завершити</button>
+      </div>
+      <p class="t-result" id="t-result" hidden></p>
+    </section>
+
+    <div class="fb-wrap" id="fb-wrap">
+      <div class="fb" id="fb" role="group" aria-label="Гриф гітари"></div>
+    </div>
+    <p class="legend2"><span><i style="background:var(--accent)"></i>корінь / зайва нота</span><span><i style="background:var(--fg)"></i>твій вибір</span><span><i style="background:var(--ok)"></i>правильно</span><span><i style="border:2px dashed var(--ok)"></i>правильний варіант</span></p>
+    <p class="note">Вгорі тонка 1-а струна (e), внизу товста 6-а. Натисни кружечок, щоб позначити лад, ще раз — щоб зняти. 0 — відкрита струна. Enter — перевірити або наступне завдання.</p>
+  </main>
+
+  <div class="modal" id="song-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sm-title">
+    <div class="modal-box">
+      <header class="modal-head">
+        <div style="display:grid;gap:2px;min-width:0"><span class="task-kicker" id="sm-kicker"></span><h2 id="sm-title"></h2></div>
+        <span class="grow"></span>
+        <span id="sm-tools"></span>
+        <button type="button" class="ghost" id="sm-close" aria-label="Закрити">✕</button>
+      </header>
+      <div class="modal-body" id="sm-body"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="cheat-modal" hidden role="dialog" aria-modal="true" aria-labelledby="cheat-title">
+    <div class="modal-box">
+      <header class="modal-head">
+        <h2 id="cheat-title">Шпаргалка музиканта</h2>
+        <span class="grow"></span>
+        <span id="cheat-tools"></span>
+        <button type="button" class="ghost" id="cheat-close" aria-label="Закрити">✕</button>
+      </header>
+      <div class="modal-body" id="cheat-body"></div>
+    </div>
+  </div>
+
+  <main id="view-setup" hidden>
+    <div class="chips" id="setup-index">
+      <button type="button" data-jump="s-home">Вдома</button>
+      <button type="button" data-jump="s-studio">Репетиція і клуб</button>
+      <button type="button" data-jump="s-4cm">4 кабелі</button>
+      <button type="button" data-jump="s-presets">Пресети</button>
+      <button type="button" data-jump="s-ctl">CTL і збереження</button>
+      <button type="button" data-jump="s-data">Дані сайту</button>
+    </div>
+
+    <article class="ref" id="s-home">
+      <h2>Вдома</h2>
+      <p>Два перемикачі міняються щоразу, коли змінюєш підключення: <b>Gt. AMP / LINE</b> на задній панелі ME-90 і <b>Output Select</b> (ручний режим → EDIT → педалями BANK → WRITE).</p>
+      <h3>Katana через Power Amp In — основний</h3>
+      <dl class="kv">
+        <dt>Кабель</dt><dd>OUTPUT L/MONO → POWER AMP IN на Katana</dd>
+        <dt>Перемикач</dt><dd>Gt. AMP</dd>
+        <dt>Output Select</dt><dd><span class="mono">12</span> — KATANA-100 RETURN</dd>
+        <dt>Гучність</dt><dd>OUTPUT LEVEL на ME-90; на Katana — низька Power Control</dd>
+      </dl>
+      <p class="note">Вмикай спершу ME-90, потім Katana. Вимикай у зворотному порядку. Ручки тембру Katana в цьому режимі майже не діють.</p>
+      <h3>Katana через звичайний вхід — запасний</h3>
+      <dl class="kv">
+        <dt>Кабель</dt><dd>OUTPUT L/MONO → INPUT на Katana</dd>
+        <dt>Перемикач</dt><dd>Gt. AMP</dd>
+        <dt>Output Select</dt><dd><span class="mono">11</span> — KATANA-100 INPUT</dd>
+        <dt>Katana</dt><dd>Чистий канал, еквалайзер на 12 годин, ефекти вимкнені</dd>
+      </dl>
+      <h3>Навушники і треки</h3>
+      <ul>
+        <li>Навушники — у PHONES на ME-90 (стерео міні-джек), перемикач <b>LINE</b>.</li>
+        <li>Треки з Moises: Bluetooth-адаптер BT-DUAL у ME-90, на телефоні вибери «ME-90 Audio». Звук іде разом з гітарою.</li>
+        <li>BOSS Tone Studio з телефона: у застосунку підключайся до «ME-90 MIDI».</li>
+      </ul>
+    </article>
+
+    <article class="ref" id="s-studio">
+      <h2>Репетиція і клуб</h2>
+      <h3>У петлю ефектів підсилювача — найкраще для кабінета</h3>
+      <dl class="kv">
+        <dt>Кабель</dt><dd>OUTPUT L/MONO → FX RETURN підсилювача</dd>
+        <dt>Перемикач</dt><dd>Gt. AMP</dd>
+        <dt>Підсилювач</dt><dd>Майстер-гучність. Якщо є FX Mix — на максимум</dd>
+      </dl>
+      <div class="tbl"><table>
+        <thead><tr><th>Підсилювач</th><th>У FX Return</th><th>У Input</th></tr></thead>
+        <tbody>
+          <tr><td>Голова + кабінет 4x12</td><td>6 — TUBE STACK 412 RETURN</td><td>5</td></tr>
+          <tr><td>Ламповий комбо 2x12</td><td>2 — TUBE COMBO 212 RETURN</td><td>1</td></tr>
+          <tr><td>Ламповий комбо 1x12</td><td>4 — TUBE COMBO 112 RETURN</td><td>3</td></tr>
+          <tr><td>Roland JC-120</td><td>8 — JC-120 RETURN</td><td>7</td></tr>
+          <tr><td>Katana-100/212</td><td>10</td><td>9</td></tr>
+          <tr><td>Katana-100 / Katana-50</td><td>12</td><td>11</td></tr>
+        </tbody>
+      </table></div>
+      <h3>У звичайний вхід комбіка</h3>
+      <p>Перемикач <b>Gt. AMP</b>, Output Select з колонки «У Input». На підсилювачі — чистий канал, gain низько, ревер вимкнений.</p>
+      <h3>У мікшер</h3>
+      <dl class="kv">
+        <dt>Кабель</dt><dd>OUTPUT L/MONO → DI-бокс → XLR у пульт</dd>
+        <dt>Перемикач</dt><dd>LINE (емуляція кабінета увімкнена)</dd>
+        <dt>Рівень</dt><dd>OUTPUT LEVEL на середину; після саундчеку не чіпати</dd>
+      </dl>
+      <p class="note">Перемикач діє на всі виходи одразу: не вийде водночас грати в кабінет і віддавати в пульт звук з емуляцією. Тоді кабінет знімають мікрофоном.</p>
+    </article>
+
+    <article class="ref" id="s-4cm">
+      <h2>Метод 4 кабелів</h2>
+      <p>Драйви ME-90 стоять перед преампом підсилювача, а модуляція, делей і ревер — у його петлі ефектів. Ти граєш на справжньому звуці підсилювача, а ME-90 працює як педалборд. Потрібен підсилювач з петлею ефектів.</p>
+      <div class="chain" aria-label="Шлях сигналу">
+        <div class="node"><b>Гітара</b></div>
+        <div class="jack">→ INPUT</div>
+        <div class="node me"><b>ME-90</b><span>вау, COMP, OD/DS</span></div>
+        <div class="jack">SEND →<br>INPUT</div>
+        <div class="node amp"><b>Підсилювач</b><span>преамп, канали</span></div>
+        <div class="jack">FX SEND →<br>RETURN</div>
+        <div class="node me"><b>ME-90</b><span>EQ/FX2, MOD, DELAY, REVERB</span></div>
+        <div class="jack">OUTPUT →<br>FX RETURN</div>
+        <div class="node amp"><b>Підсилювач</b><span>кінцевий каскад, кабінет</span></div>
+      </div>
+      <ol>
+        <li>Гітара → <b>INPUT</b> ME-90.</li>
+        <li>ME-90 <b>SEND</b> → <b>INPUT</b> підсилювача.</li>
+        <li><b>FX SEND</b> підсилювача → ME-90 <b>RETURN</b>.</li>
+        <li>ME-90 <b>OUTPUT L/MONO</b> → <b>FX RETURN</b> підсилювача.</li>
+      </ol>
+      <dl class="kv">
+        <dt>Системне</dt><dd>Точка вставки SEND/RETURN — <span class="mono">S0</span> (перед преампом)</dd>
+        <dt>Перемикач</dt><dd>Gt. AMP</dd>
+        <dt>Output Select</dt><dd>Тип «RETURN» під твій підсилювач (див. таблицю вище)</dd>
+        <dt>У патчі</dt><dd>PREAMP вимкнений, SEND/RETURN увімкнений: тримай EDIT і натисни педаль CTL (1 — увімкнено)</dd>
+      </dl>
+      <p class="note">Для цього методу заведи окремий банк патчів: без преампу ME-90 вдома вони звучатимуть інакше. Якщо з'явиться гудіння, спробуй ground lift на DI чи підсилювачі. Перемикання каналів підсилювача робиш його футсвічем.</p>
+    </article>
+
+    <article class="ref wide" id="s-presets">
+      <div class="block-head"><h2>Пресети ME-90</h2><span class="muted" id="preset-count"></span></div>
+      <p class="note">Тут база пресетів процесора. Назва, яку ти змінюєш тут, одразу з'являється в усіх піснях з цим пресетом. Преамп: GAIN / BASS / MIDDLE / TREBLE / LEVEL. «Вимк.» — налаштовано, але вимкнено; вмикає CTL.</p>
+      <div class="pgrid" id="preset-list"><p class="muted">Завантажую пресети…</p></div>
+      <div id="preset-add"></div>
+    </article>
+
+    <article class="ref" id="s-data">
+      <h2>Дані сайту</h2>
+      <p>Тут можна зберегти резервну копію всіх пісень, пресетів, матеріалів і коментарів у файл або завантажити дані з такого файлу.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button type="button" id="data-export">Зберегти резервну копію</button>
+        <label class="btn" for="data-import">Завантажити дані з файлу</label><input id="data-import" type="file" accept="application/json,.json" hidden>
+      </div>
+      <p class="status" id="data-status"></p>
+      <p class="note">Завантаження з файлу додає записи з файлу і перезаписує ті, що мають такий самий ідентифікатор. Решта даних не змінюється.</p>
+    </article>
+
+    <article class="ref" id="s-ctl">
+      <h2>CTL і збереження</h2>
+      <ol>
+        <li>Налаштуй звук і <b>вимкни</b> ефекти, які вмикатиме CTL.</li>
+        <li><b>WRITE</b> → BANK до U1–U9 → педаль 1–4 → <b>WRITE</b>.</li>
+        <li>Не перемикаючи патч, кнопка <b>CTL</b> (на дисплеї «Ct»).</li>
+        <li>Натисни лише потрібні ефекти: 1 COMP/FX1, 2 OD/DS, 3 MOD, 4 DELAY, BANK▲ PREAMP, BANK▼ EQ/FX2, CTL REVERB.</li>
+        <li>Ще раз <b>CTL</b> → BANK до «to» → <b>CTL</b>.</li>
+        <li><b>WRITE</b> → той самий банк і номер → <b>WRITE</b>.</li>
+      </ol>
+      <p class="note">CTL вмикає й вимикає блоки, але не змінює тип ефекту. Замість педалі ефекту можна повернути одну ручку — тоді CTL перемикає її значення.</p>
+    </article>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<script src="config.js"></script>
+<script src="backend.js"></script>
+<script>
+(function(){
+  // presets live in db collection "presets" (doc id = slot, e.g. U1-1)
+  const PFIELDS=[["preamp","Преамп"],["odds","OD/DS"],["fx1","COMP/FX1"],["mod","MOD"],["eqfx2","EQ/FX2"],["delay","Delay"],["reverb","Reverb"],["ns","NS"],["ctl","CTL"],["notes","Нотатки"]];
+  let presets=[], presetsLoaded=false, editingPreset=null, presetMsg=null, delPreset=null;
+  const slotKey=s=>{const m=/^U(\d)-(\d)$/.exec(s||""); return m?Number(m[1])*10+Number(m[2]):999};
+  const sortedPresets=()=>presets.slice().sort((a,b)=>slotKey(a.id)-slotKey(b.id));
+  const presetName=slot=>{const p=presets.find(x=>x.id===slot); return p?(p.name||""):""};
+  const TEMPLATE=["Інтро","Куплет 1","Пре-приспів","Приспів","Куплет 2","Приспів","Соло","Бридж","Приспів","Кода"];
+  const $=s=>document.querySelector(s);
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  function fillPresetFilter(){
+    const sel=$("#f-preset"), cur=sel.value;
+    sel.innerHTML=`<option value="">Усі</option>`+sortedPresets().map(p=>`<option value="${esc(p.id)}">${esc(p.id)} ${esc(p.name)}</option>`).join("");
+    sel.value=sortedPresets().some(p=>p.id===cur)?cur:"";
+  }
+  function renderPresets(){
+    const box=$("#preset-list"); if(!box) return;
+    const list=sortedPresets(), used=id=>songs.filter(s=>s.preset===id).length;
+    $("#preset-count").textContent=presetsLoaded?`${list.length} ${plural(list.length,"пресет","пресети","пресетів")}`:"";
+    if(!presetsLoaded){ box.innerHTML=`<p class="muted">${db?"Завантажую пресети…":"Пресети відкриваються на claude.ai після входу."}</p>`; }
+    else if(!list.length){ box.innerHTML=`<p class="muted">Пресетів ще немає. ${canWrite?"Додай перший формою нижче.":""}</p>`; }
+    else box.innerHTML=list.map(p=>{
+      const n=used(p.id);
+      if(editingPreset===p.id) return `<form class="pcard pform" data-pedit="${esc(p.id)}">
+          <header class="w"><span class="slot">${esc(p.id)}</span></header>
+          <label class="f w">Назва<input name="name" value="${esc(p.name)}" required></label>
+          ${PFIELDS.map(([k,l])=>`<label class="f${k==="notes"||k==="ctl"||k==="preamp"?" w":""}">${l}<input name="${k}" value="${esc(p[k])}"></label>`).join("")}
+          <span class="row-acts"><button type="submit" class="primary">Зберегти</button><button type="button" class="ghost" data-pcancel>Скасувати</button></span>
+        </form>`;
+      const confirm=delPreset===p.id?`<span class="confirm">Видалити ${esc(p.id)}?${n?` Його використовують ${n} ${plural(n,"пісня","пісні","пісень")}.`:""} <button type="button" class="danger" data-pdely="${esc(p.id)}">Так</button><button type="button" class="ghost" data-pdeln>Ні</button></span>`:"";
+      return `<div class="pcard">
+          <header><span class="slot">${esc(p.id)}</span><span class="pname">${esc(p.name||"Без назви")}</span>
+            ${canWrite?`<span><button type="button" data-pe="${esc(p.id)}">Змінити</button> <button type="button" class="ghost" data-pd="${esc(p.id)}" aria-label="Видалити пресет">✕</button></span>`:""}</header>
+          <dl>${PFIELDS.filter(([k])=>p[k]).map(([k,l])=>`<dt>${l}</dt><dd>${esc(p[k])}</dd>`).join("")}</dl>
+          <span class="used">${n?`У ${n} ${plural(n,"пісні","піснях","піснях")}`:"Ще не призначений пісням"}</span>${confirm}
+        </div>`;
+    }).join("");
+    $("#preset-add").innerHTML=canWrite&&db&&presetsLoaded?`<form class="pform" id="padd" style="margin-top:14px;padding:12px;border:1px dashed var(--line);border-radius:10px">
+        <label class="f">Слот (U1-1 … U9-4)<input name="slot" required pattern="U[1-9]-[1-4]" placeholder="U3-1"></label>
+        <label class="f">Назва<input name="name" required placeholder="Наприклад: CLEAN 2"></label>
+        <label class="f w">Преамп<input name="preamp" placeholder="TWIN COMBO 25/45/50/60/50"></label>
+        <span class="row-acts"><button type="submit" class="primary">+ Додати пресет</button><span class="status ${presetMsg?.cls||""}">${esc(presetMsg?.text||"")}</span></span>
+      </form>`:"";
+    box.querySelectorAll("[data-pe]").forEach(b=>b.onclick=()=>{editingPreset=b.dataset.pe; delPreset=null; renderPresets();});
+    box.querySelectorAll("[data-pd]").forEach(b=>b.onclick=()=>{delPreset=b.dataset.pd; editingPreset=null; renderPresets();});
+    box.querySelectorAll("[data-pdeln]").forEach(b=>b.onclick=()=>{delPreset=null; renderPresets();});
+    box.querySelectorAll("[data-pdely]").forEach(b=>b.onclick=async()=>{
+      try{ await db.doc("presets/"+b.dataset.pdely).delete(); presets=presets.filter(x=>x.id!==b.dataset.pdely); }catch(_){}
+      delPreset=null; renderPresets(); fillPresetFilter(); renderList();
+    });
+    box.querySelectorAll("[data-pcancel]").forEach(b=>b.onclick=()=>{editingPreset=null; renderPresets();});
+    box.querySelectorAll("form[data-pedit]").forEach(f=>f.onsubmit=async e=>{
+      e.preventDefault(); const id=f.dataset.pedit, fd=new FormData(f);
+      const body={slot:id,name:String(fd.get("name")||"").trim()}; PFIELDS.forEach(([k])=>body[k]=String(fd.get(k)||"").trim());
+      try{ await db.doc("presets/"+id).set(body); const i=presets.findIndex(x=>x.id===id); presets[i]={id,...body}; editingPreset=null; }
+      catch(_){ presetMsg={text:"Не вдалося зберегти пресет.",cls:"err"}; }
+      renderPresets(); fillPresetFilter(); renderList();
+    });
+    const add=$("#padd"); if(add) add.onsubmit=async e=>{
+      e.preventDefault(); const fd=new FormData(add), slot=String(fd.get("slot")||"").trim().toUpperCase();
+      if(!/^U[1-9]-[1-4]$/.test(slot)){ presetMsg={text:"Слот має бути у форматі U1-1 … U9-4.",cls:"err"}; return renderPresets(); }
+      if(presets.some(p=>p.id===slot)){ presetMsg={text:`Слот ${slot} уже зайнятий. Зміни той пресет або вибери інший слот.`,cls:"err"}; return renderPresets(); }
+      const body={slot,name:String(fd.get("name")||"").trim(),preamp:String(fd.get("preamp")||"").trim()}; PFIELDS.forEach(([k])=>{if(body[k]===undefined) body[k]="";});
+      try{ await db.doc("presets/"+slot).set(body); if(!presets.some(p=>p.id===slot)) presets.push({id:slot,...body}); presetMsg={text:`Пресет ${slot} додано. Решту полів заповни кнопкою «Змінити».`,cls:"ok"}; }
+      catch(_){ presetMsg={text:"Не вдалося додати пресет.",cls:"err"}; }
+      renderPresets(); fillPresetFilter(); renderList();
+    };
+  }
+  document.querySelectorAll("[data-jump]").forEach(b=>b.addEventListener("click",()=>{
+    const el=document.getElementById(b.dataset.jump); if(el) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+  }));
+
+  // routing
+  function route(){
+    let h=(location.hash||"#songs").slice(1); if(!["songs","learn","trainer","setup"].includes(h)) h="songs";
+    for(const v of ["songs","learn","trainer","setup"]){ $("#view-"+v).hidden=v!==h; $("#tab-"+v).setAttribute("aria-current",v===h?"page":"false"); }
+  }
+  addEventListener("hashchange",route); route();
+
+  // state
+  let db=null, assets=null, canWrite=true, songs=[], loaded=false, openId=null, draft=null, dirty=false;
+  const tuningOf=s=>s.tuning||"E";
+  const keyOf=s=>Number(s.keyShift||0);
+  const sorted=()=>songs.slice().sort((a,b)=>(a.order??1e9)-(b.order??1e9)||String(a.title).localeCompare(String(b.title)));
+
+  // practice + rating helpers
+  const pad=n=>String(n).padStart(2,"0");
+  const todayStr=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+  const logOf=s=>Array.isArray(s.practiceLog)?s.practiceLog.filter(x=>typeof x==="string"):[];
+  const lastOf=s=>{const l=logOf(s);return l.length?l.slice().sort().pop():null};
+  const daysSince=s=>{const l=lastOf(s); if(!l) return null; const [y,m,d]=l.split("-").map(Number); const t=new Date(); const a=Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()), b=Date.UTC(y,m-1,d); return Math.max(0,Math.round((a-b)/864e5));};
+  const plural=(n,one,few,many)=>{const m10=n%10,m100=n%100; return m10===1&&m100!==11?one:(m10>=2&&m10<=4&&(m100<12||m100>14)?few:many)};
+  const agoText=s=>{const d=daysSince(s); if(d===null) return "ще не тренували"; if(d===0) return "сьогодні"; if(d===1) return "вчора"; return `${d} ${plural(d,"день","дні","днів")} тому`;};
+  const rateOf=s=>{const r=Number(s.rating||0); return r>=1&&r<=5?r:0};
+  const starsHtml=r=>r?`<span class="stars" aria-label="Готовність ${r} з 5"><b>${"★".repeat(r)}</b><span>${"★".repeat(5-r)}</span></span>`:`<span class="stars muted">без оцінки</span>`;
+  const VOCALISTS=["Саша","Олексій","Алінка","Іванка"];
+  const vocsOf=s=>Array.isArray(s&&s.vocals)?s.vocals.filter(v=>typeof v==="string"&&v):[];
+  const vocRank=s=>{const v=vocsOf(s); if(!v.length) return 999; const i=VOCALISTS.indexOf(v[0]); return (i<0?50:i)*2+(v.length>1?1:0);};
+  $("#f-voc").innerHTML=`<option value="">Усі</option>${VOCALISTS.map(v=>`<option value="${v}">${v}</option>`).join("")}<option value="__none">Без вокаліста</option>`;
+  const RATE_LABEL=["","Дуже погано","Слабко","Середньо","Майже готова","Повністю готова"];
+  const safeUrl=u=>{try{const x=new URL(String(u||"").trim()); return x.protocol==="https:"?x.href:""}catch(_){return ""}};
+  const qs=s=>encodeURIComponent(`${s.artist||""} ${s.title||""}`.trim());
+  const appleUrl=s=>`https://music.apple.com/search?term=${qs(s)}`;
+  const ytUrl=s=>`https://www.youtube.com/results?search_query=${qs(s)}+official+audio`;
+  const ICON={
+    text:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>',
+    cmt:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+    reh:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>'
+  };
+  let comments=[], commentsLoaded=false, me=null, userNs=null, cmtNames={};
+  const cmtCount=id=>comments.filter(c=>c.songId===id).length;
+  function iconBtns(s){
+    const n=cmtCount(s.id), hasText=!!(s.lyrics&&s.lyrics.trim());
+    return `<button type="button" class="ib${hasText?"":" empty"}" data-lyr="${esc(s.id)}" aria-label="Текст пісні">${ICON.text}Текст</button>
+      <button type="button" class="ib" data-cmt="${esc(s.id)}" aria-label="Коментарі: ${n}">${ICON.cmt}Коментар${n?` <span class="cnt">${n}</span>`:""}</button>
+      ${canWrite?`<button type="button" class="ib reh" data-reh="${esc(s.id)}" aria-pressed="${!!s.rehearsal}">${ICON.reh}${s.rehearsal?"На репетиції":"На репетицію"}</button>`:(s.rehearsal?`<span class="reh-tag">на репетицію</span>`:"")}`;
+  }
+  const geniusUrl=s=>`https://genius.com/search?q=${qs(s)}`;
+  const mxmUrl=s=>`https://www.musixmatch.com/search?query=${qs(s)}`;
+  function lyricLinks(s){
+    const own=safeUrl(s.lyricsUrl);
+    return `${own?`<a class="btn" href="${esc(own)}" target="_blank" rel="noopener">Текст за посиланням</a>`:""}<a class="btn" href="${esc(geniusUrl(s))}" target="_blank" rel="noopener">Genius</a><a class="btn" href="${esc(mxmUrl(s))}" target="_blank" rel="noopener">Musixmatch</a>`;
+  }
+  const ugSearch=s=>`https://www.ultimate-guitar.com/search.php?search_type=title&value=${qs(s)}`;
+  function linksHtml(s){
+    const l=safeUrl(s.lessonUrl), m=safeUrl(s.songUrl)||ytUrl(s), ug=safeUrl(s.ugUrl)||ugSearch(s);
+    return `<span class="links" data-noopen>
+      ${l?`<a class="lnk" href="${esc(l)}" target="_blank" rel="noopener"><span class="ic">▶</span>Розбір</a>`:""}
+      <a class="lnk" href="${esc(ug)}" target="_blank" rel="noopener"><span class="ic">♯</span>UG</a>
+      <a class="lnk" href="${esc(m)}" target="_blank" rel="noopener"><span class="ic">♪</span>Пісня</a>
+      <a class="lnk" href="${esc(appleUrl(s))}" target="_blank" rel="noopener"><span class="ic">♪</span>Apple Music</a>
+      ${iconBtns(s)}</span>`;
+  }
+
+  function filtersActive(){return !!($("#q").value.trim()||$("#f-tuning").value||$("#f-preset").value||$("#f-key").value||$("#f-rate").value||$("#f-reh").value)}
+  function renderList(){
+    if(openId) return;
+    const all=sorted(); const q=$("#q").value.trim().toLowerCase();
+    const ft=$("#f-tuning").value, fp=$("#f-preset").value, fk=$("#f-key").value, fr=$("#f-rate").value, fh=$("#f-reh").value, fv=$("#f-voc").value, sort=$("#sort").value;
+    let list=all.filter(s=>{
+      if(q && !(`${s.title} ${s.artist}`.toLowerCase().includes(q))) return false;
+      if(ft==="__other"){ if(["E","Drop D"].includes(tuningOf(s))) return false; } else if(ft && tuningOf(s)!==ft) return false;
+      if(fp && s.preset!==fp) return false;
+      if(fk==="0" && keyOf(s)!==0) return false;
+      if(fk==="shifted" && keyOf(s)===0) return false;
+      const r=rateOf(s);
+      if(fr==="low"&&!(r>=1&&r<=2)) return false;
+      if(fr==="3"&&r!==3) return false;
+      if(fr==="high"&&r<4) return false;
+      if(fr==="none"&&r) return false;
+      if(fh==="yes"&&!s.rehearsal) return false;
+      if(fh==="no"&&s.rehearsal) return false;
+      if(fv==="__none"&&vocsOf(s).length) return false;
+      if(fv&&fv!=="__none"&&!vocsOf(s).includes(fv)) return false;
+      return true;
+    });
+    const pos=s=>all.indexOf(s);
+    const cmp={
+      practice:(a,b)=>logOf(a).length-logOf(b).length||(daysSince(b)??1e6)-(daysSince(a)??1e6),
+      stale:(a,b)=>(daysSince(b)??1e6)-(daysSince(a)??1e6)||logOf(a).length-logOf(b).length,
+      "rate-asc":(a,b)=>(rateOf(a)||0)-(rateOf(b)||0),
+      "rate-desc":(a,b)=>rateOf(b)-rateOf(a),
+      bpm:(a,b)=>(Number(a.bpm)||1e6)-(Number(b.bpm)||1e6),
+      voc:(a,b)=>vocRank(a)-vocRank(b)
+    }[sort];
+    if(cmp) list=list.slice().sort((a,b)=>cmp(a,b)||pos(a)-pos(b));
+    const fa=filtersActive(), canMove=!fa&&sort==="order"&&canWrite;
+    const nActive=[$("#q").value.trim(),$("#f-tuning").value,$("#f-preset").value,$("#f-key").value,$("#f-rate").value,$("#f-reh").value,$("#f-voc").value].filter(Boolean).length+(sort!=="order"?1:0);
+    $("#fcount").hidden=!nActive; $("#fcount").textContent=nActive;
+    $("#reorder-hint").hidden=canMove||!canWrite||!list.length;
+    const nReh=all.filter(x=>x.rehearsal).length;
+    $("#count").textContent=loaded?(fa?`Показано ${list.length} з ${all.length}`:`${all.length} ${plural(all.length,"пісня","пісні","пісень")} у сетлисті`)+(nReh?` · на репетицію: ${nReh}`:""):"Завантажую пісні…";
+    $("#empty").hidden=!(loaded&&!all.length);
+    const today=todayStr();
+    $("#songs").innerHTML=list.map(s=>{
+      const p=pos(s), k=keyOf(s), r=rateOf(s), n=logOf(s).length, ds=daysSince(s), done=logOf(s).includes(today);
+      const tags=[
+        s.preset?`<span class="tag preset">${esc(s.preset)}${presetName(s.preset)?" "+esc(presetName(s.preset)):""}</span>`:"",
+        `<span class="tag${tuningOf(s)!=="E"?" drop":""}">${esc(tuningOf(s))}</span>`,
+        k?`<span class="tag shift">${k>0?"+":"−"}${Math.abs(k)}</span>`:"",
+        ...vocsOf(s).map(v=>`<span class="tag voc">${esc(v)}</span>`)
+      ].join("");
+      const bpm=Number(s.bpm)>0?`<span class="bpm">${esc(s.bpm)}<small>BPM</small></span>`:`<span class="bpm none">—<small>BPM</small></span>`;
+      const prac=canWrite?`<label class="prac" data-noopen><input type="checkbox" data-prac="${esc(s.id)}" ${done?"checked":""} aria-label="Тренував сьогодні: ${esc(s.title)}">сьогодні</label>`:"<span></span>";
+      const mv=canMove?`<div class="mv"><button type="button" data-mv="-1" data-id="${esc(s.id)}" aria-label="Вище" ${p===0?"disabled":""}>▲</button><button type="button" data-mv="1" data-id="${esc(s.id)}" aria-label="Нижче" ${p===all.length-1?"disabled":""}>▼</button></div>`:"<span></span>";
+      const stale=ds===null||ds>=14;
+      return `<li class="row${r?" r"+r:""}${s.rehearsal?" on-reh":""}" tabindex="0" data-open="${esc(s.id)}"><span class="num">${p+1}</span>
+        <span class="ttl"><b>${esc(s.title||"Без назви")}</b><span>${esc(s.artist||"")}</span>
+          <span class="meta">${starsHtml(r)}<span>Тренувань: ${n}</span><span class="${stale?"stale":""}">${agoText(s)}</span></span>${linksHtml(s)}</span>
+        <span class="tags">${tags}</span>${bpm}${prac}${mv}</li>`;
+    }).join("");
+  }
+
+  async function togglePractice(id,on){
+    const s=songs.find(x=>x.id===id); if(!s) return;
+    const t=todayStr(); let log=logOf(s);
+    if(on&&!log.includes(t)) log=[...log,t];
+    if(!on) log=log.filter(x=>x!==t);
+    const prev=s.practiceLog; s.practiceLog=log;
+    if(draft&&openId===id) draft.practiceLog=log.slice();
+    try{ await db.doc("songs/"+id).update({practiceLog:log}); }
+    catch(e){ s.practiceLog=prev; if(draft&&openId===id) draft.practiceLog=(prev||[]).slice(); }
+    openId===id?renderCard():renderList();
+  }
+  async function setRating(id,val){
+    const s=songs.find(x=>x.id===id); if(!s) return;
+    const prev=s.rating; s.rating=val; if(draft) draft.rating=val;
+    try{ await db.doc("songs/"+id).update({rating:val}); }
+    catch(e){ s.rating=prev; if(draft) draft.rating=prev; }
+    renderCard();
+  }
+
+  async function writeOrder(arr){
+    for(let i=0;i<arr.length;i++){
+      if(arr[i].order!==i+1){ arr[i].order=i+1; try{ await db.doc("songs/"+arr[i].id).update({order:i+1}); }catch(e){ console.warn(e); } }
+    }
+  }
+  async function moveTo(id,newPos){
+    const arr=sorted(); const i=arr.findIndex(s=>s.id===id); if(i<0) return;
+    const [s]=arr.splice(i,1); newPos=Math.max(0,Math.min(arr.length,newPos)); arr.splice(newPos,0,s);
+    await writeOrder(arr); renderList();
+  }
+
+  $("#songs").addEventListener("change",e=>{
+    const cb=e.target.closest("[data-prac]"); if(cb) togglePractice(cb.dataset.prac,cb.checked);
+  });
+  $("#songs").addEventListener("click",e=>{
+    const lb=e.target.closest("[data-lyr]"); if(lb){ e.stopPropagation(); openLyrics(lb.dataset.lyr); return; }
+    const cb2=e.target.closest("[data-cmt]"); if(cb2){ e.stopPropagation(); openComments(cb2.dataset.cmt); return; }
+    const rb=e.target.closest("[data-reh]"); if(rb){ e.stopPropagation(); toggleReh(rb.dataset.reh); return; }
+    if(e.target.closest("[data-noopen]")){ e.stopPropagation(); return; }
+    const mv=e.target.closest("[data-mv]");
+    if(mv){ e.stopPropagation(); const arr=sorted(); const i=arr.findIndex(s=>s.id===mv.dataset.id); moveTo(mv.dataset.id,i+Number(mv.dataset.mv)); return; }
+    const row=e.target.closest("[data-open]"); if(row) openCard(row.dataset.open);
+  });
+  $("#songs").addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.classList.contains("row")){ openCard(e.target.dataset.open);} });
+  ["#q","#f-tuning","#f-preset","#f-key","#f-rate","#f-reh","#f-voc","#sort"].forEach(s=>$(s).addEventListener("input",renderList));
+  function setFiltersOpen(open){ $("#filters").hidden=!open; $("#toggle-filters").setAttribute("aria-expanded",String(open)); try{localStorage.setItem("filtersOpen",open?"1":"0")}catch(_){} }
+  $("#toggle-filters").addEventListener("click",()=>setFiltersOpen($("#filters").hidden));
+  $("#reset-filters").addEventListener("click",()=>{ ["#q","#f-tuning","#f-preset","#f-key","#f-rate","#f-reh","#f-voc"].forEach(s=>$(s).value=""); $("#sort").value="order"; renderList(); });
+  try{ if(localStorage.getItem("filtersOpen")==="1") setFiltersOpen(true); }catch(_){}
+
+  $("#add-song").addEventListener("click",async()=>{
+    if(!db||!canWrite) return;
+    const order=sorted().length+1;
+    const body={title:"Нова пісня",artist:"",order,tuning:"E",keyShift:0,bpm:"",preset:"",ctl:"",notes:"",sections:[],pdfs:[]};
+    try{ const ref=await db.collection("songs").add(body); songs.push({id:ref.id,...body}); openCard(ref.id); }
+    catch(e){ $("#count").textContent="Не вдалося додати пісню. Спробуй ще раз."; }
+  });
+
+  // card
+  function openCard(id){
+    const s=songs.find(x=>x.id===id); if(!s) return;
+    openId=id; dirty=false;
+    draft=JSON.parse(JSON.stringify({sections:[],pdfs:[],...s}));
+    $("#list-view").hidden=true; $("#card-view").hidden=false;
+    renderCard(); scrollTo(0,0);
+  }
+  function closeCard(){ openId=null; draft=null; $("#card-view").hidden=true; $("#list-view").hidden=false; renderList(); }
+
+  function renderCard(msg,cls){
+    const d=draft, all=sorted(), pos=all.findIndex(s=>s.id===openId)+1, ro=!canWrite;
+    const opt=(v,l,cur)=>`<option value="${esc(v)}" ${String(cur)===String(v)?"selected":""}>${esc(l)}</option>`;
+    const tun=["E","Drop D","Eb","D","Drop C","Drop C#"]; const tCur=d.tuning||"E";
+    const tunOpts=tun.map(t=>opt(t,t,tCur)).join("")+(tun.includes(tCur)?"":opt(tCur,tCur,tCur));
+    const keyOpts=[-5,-4,-3,-2,-1,0,1,2,3,4,5].map(k=>opt(k,k===0?"0 — оригінал":(k>0?"+"+k:"−"+Math.abs(k)),Number(d.keyShift||0))).join("");
+    const plist=sortedPresets();
+    const presetOpts=opt("","—",d.preset)+plist.map(p=>opt(p.id,p.id+" "+(p.name||""),d.preset)).join("")+(d.preset&&!plist.some(p=>p.id===d.preset)?opt(d.preset,d.preset+" (немає в базі)",d.preset):"");
+    const sec=(d.sections||[]).map((p,i)=>`
+      <div class="part" data-i="${i}">
+        <input data-sf="name" value="${esc(p.name)}" placeholder="Частина" aria-label="Назва частини" ${ro?"disabled":""}>
+        <textarea class="chords" data-sf="chords" rows="2" placeholder="Am  F  C  G" aria-label="Акорди" ${ro?"disabled":""}>${esc(p.chords)}</textarea>
+        <input class="pnote" data-sf="note" value="${esc(p.note)}" placeholder="Примітка: CTL, вау, ритм…" aria-label="Примітка" ${ro?"disabled":""}>
+        ${ro?"":`<div class="ctrl"><button type="button" data-sec="up" aria-label="Вище" ${i===0?"disabled":""}>▲</button><button type="button" data-sec="down" aria-label="Нижче" ${i===d.sections.length-1?"disabled":""}>▼</button><button type="button" data-sec="del" aria-label="Видалити частину">✕</button></div>`}
+      </div>`).join("");
+    const pdfs=(d.pdfs||[]).map((f,i)=>`
+      <div class="pdf"><a href="${esc(blobUrl(f.id))}" target="_blank" rel="noopener">${esc(f.name||"Ноти.pdf")}</a>
+      ${assets?`<span data-pdfwrap="${i}"><button type="button" class="ghost" data-pdfdel="${i}">Видалити</button></span>`:""}</div>`).join("");
+    $("#card-view").innerHTML=`
+      <div class="card-head">
+        <span style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="ib" data-lyr="${esc(openId)}">${ICON.text}Текст</button>
+          <button type="button" class="ib" data-cmt="${esc(openId)}">${ICON.cmt}Коментарі${cmtCount(openId)?` <span class="cnt">${cmtCount(openId)}</span>`:""}</button>
+          ${ro?"":`<button type="button" class="ib reh" data-reh="${esc(openId)}" aria-pressed="${!!d.rehearsal}">${ICON.reh}${d.rehearsal?"На репетиції":"На репетицію"}</button>`}
+        </span>
+        <span class="muted">№ ${pos} з ${all.length}</span>
+      </div>
+      <div class="grid">
+        <label class="f w2">Назва<input id="c-title" value="${esc(d.title)}" ${ro?"disabled":""}></label>
+        <label class="f w2">Виконавець<input id="c-artist" value="${esc(d.artist)}" ${ro?"disabled":""}></label>
+        <label class="f">Номер у сетлисті<input id="c-pos" type="number" min="1" max="${all.length}" value="${pos}" ${ro?"disabled":""}></label>
+        <label class="f">Стрій<select id="c-tuning" ${ro?"disabled":""}>${tunOpts}</select></label>
+        <label class="f">Тональність<select id="c-key" ${ro?"disabled":""}>${keyOpts}</select></label>
+        <label class="f">BPM<input id="c-bpm" inputmode="numeric" value="${esc(d.bpm)}" placeholder="120" ${ro?"disabled":""}></label>
+        <label class="f w2">Пресет ME-90<select id="c-preset" ${ro?"disabled":""}>${presetOpts}</select></label>
+        <div class="f w4">Вокаліст<span class="vocs" role="group" aria-label="Вокаліст">${VOCALISTS.map(v=>`<button type="button" class="sbtn" data-voc="${esc(v)}" aria-pressed="${vocsOf(d).includes(v)}" ${ro?"disabled":""}>${esc(v)}</button>`).join("")}</span></div>
+        <label class="f w2">CTL<input id="c-ctl" value="${esc(d.ctl)}" placeholder="Соло / драйв на приспів" ${ro?"disabled":""}></label>
+        <label class="f w4">Як грати<textarea id="c-notes" rows="2" ${ro?"disabled":""}>${esc(d.notes)}</textarea></label>
+        <label class="f w4">Текст пісні<textarea id="c-lyrics" rows="8" placeholder="Встав текст пісні. Порожні рядки розділяють куплети." ${ro?"disabled":""}>${esc(d.lyrics)}</textarea></label>
+      </div>
+      ${d.bpm&&Number(d.bpm)>0?`<p class="note">Делей у темп: четвертна ${Math.round(60000/Number(d.bpm))} мс, пунктирна восьма ${Math.round(45000/Number(d.bpm))} мс.</p>`:""}
+      <section class="block">
+        <div class="block-head"><h3>Розбір і пісня</h3></div>
+        <div class="media">
+          <label class="f">Відеорозбір (YouTube)<input id="c-lesson" type="url" value="${esc(d.lessonUrl)}" placeholder="https://www.youtube.com/watch?v=…" ${ro?"disabled":""}></label>
+          <span class="acts">${safeUrl(d.lessonUrl)?`<a class="btn" href="${esc(safeUrl(d.lessonUrl))}" target="_blank" rel="noopener">▶ Відкрити розбір</a>`:""}</span>
+          <label class="f">Пісня для тренування (YouTube, Apple Music, Spotify)<input id="c-song" type="url" value="${esc(d.songUrl)}" placeholder="https://…" ${ro?"disabled":""}></label>
+          <span class="acts"><a class="btn" href="${esc(safeUrl(d.songUrl)||ytUrl(d))}" target="_blank" rel="noopener">♪ Пісня</a><a class="btn" href="${esc(appleUrl(d))}" target="_blank" rel="noopener">Apple Music</a></span>
+          <label class="f">Текст пісні (посилання)<input id="c-lyrurl" type="url" value="${esc(d.lyricsUrl)}" placeholder="https://genius.com/…" ${ro?"disabled":""}></label>
+          <span class="acts">${lyricLinks(d)}</span>
+          <label class="f">Акорди / таби (Ultimate Guitar)<input id="c-ug" type="url" value="${esc(d.ugUrl)}" placeholder="https://tabs.ultimate-guitar.com/…" ${ro?"disabled":""}></label>
+          <span class="acts"><a class="btn" href="${esc(safeUrl(d.ugUrl)||ugSearch(d))}" target="_blank" rel="noopener">♯ Ultimate Guitar</a></span>
+        </div>
+        <p class="note">Посилання відкриваються в новій вкладці або в застосунку, тож пісня грає паралельно зі сторінкою. Встав посилання на конкретне відео, щоб замінити пошук. Після зміни натисни «Зберегти».</p>
+      </section>
+      <section class="block">
+        <div class="block-head"><h3>Готовність</h3><span class="muted">${rateOf(d)?`${rateOf(d)} з 5 — ${RATE_LABEL[rateOf(d)]}`:"Ще без оцінки"}</span></div>
+        <div class="rate" role="group" aria-label="Готовність від 1 до 5">
+          ${[1,2,3,4,5].map(v=>`<button type="button" class="v${v}" data-rate="${v}" aria-pressed="${rateOf(d)===v}" title="${RATE_LABEL[v]}" ${ro?"disabled":""}>${v}</button>`).join("")}
+          ${!ro&&rateOf(d)?`<button type="button" class="ghost" data-rate="0">Скинути</button>`:""}
+        </div>
+      </section>
+      <section class="block">
+        <div class="block-head"><h3>Тренування</h3></div>
+        <div class="practice">
+          <span><span class="big">${logOf(d).length}</span> <span class="muted">${plural(logOf(d).length,"тренування","тренування","тренувань")}</span></span>
+          <span>Останнє: <b>${lastOf(d)?lastOf(d).split("-").reverse().join(".")+" · "+agoText(d):"ще не було"}</b></span>
+          ${ro?"":`<label><input type="checkbox" id="c-prac" ${logOf(d).includes(todayStr())?"checked":""}>Тренував сьогодні</label>`}
+        </div>
+      </section>
+      <section class="block">
+        <div class="block-head"><h3>Структура й акорди</h3>
+          ${ro?"":`<span style="display:flex;gap:6px;flex-wrap:wrap">${d.sections.length?"":`<button type="button" id="tpl">Типова структура</button>`}<button type="button" id="add-sec">+ Частина</button></span>`}
+        </div>
+        ${sec||`<p class="muted">Ще немає частин. Додай типову структуру (інтро, куплет, приспів, соло…) або частини по одній.</p>`}
+      </section>
+      <section class="block">
+        <div class="block-head"><h3>Ноти (PDF)</h3>
+          ${assets?`<label class="btn" for="pdf-in">Прикріпити PDF</label><input id="pdf-in" type="file" accept="application/pdf" hidden>`:""}
+        </div>
+        <div class="pdfs">${pdfs||`<p class="muted">Нот ще немає.${assets?" Прикріпи PDF — він відкриється тут для всіх, хто бачить сторінку.":" Прикріпляти PDF може власник або редактор сторінки."}</p>`}</div>
+      </section>
+      <div class="savebar">
+        <button type="button" class="back" id="back">← Сетлист</button>
+        ${ro?"":`<button type="button" class="primary" id="save">Зберегти</button>
+        <span class="status ${cls||""}" id="status">${esc(msg||(dirty?"Є незбережені зміни":""))}</span>
+        <span style="flex:1"></span>
+        <span id="delwrap"><button type="button" class="danger" id="del">Видалити пісню</button></span>`}
+      </div>`;
+    bindCard();
+  }
+
+  function setDirty(){ dirty=true; const st=$("#status"); if(st){st.textContent="Є незбережені зміни"; st.className="status";} }
+  function bindCard(){
+    $("#back").onclick=closeCard;
+    document.querySelectorAll("#card-view [data-lyr]").forEach(b=>b.onclick=()=>openLyrics(openId));
+    document.querySelectorAll("#card-view [data-cmt]").forEach(b=>b.onclick=()=>openComments(openId));
+    document.querySelectorAll("#card-view [data-reh]").forEach(b=>b.onclick=()=>toggleReh(openId));
+    document.querySelectorAll("#card-view [data-voc]").forEach(b=>b.onclick=()=>{
+      const v=b.dataset.voc, cur=vocsOf(draft); draft.vocals=cur.includes(v)?cur.filter(x=>x!==v):VOCALISTS.filter(x=>cur.includes(x)||x===v);
+      b.setAttribute("aria-pressed",String(draft.vocals.includes(v))); setDirty();
+    });
+    const map={"#c-title":"title","#c-artist":"artist","#c-tuning":"tuning","#c-bpm":"bpm","#c-preset":"preset","#c-ctl":"ctl","#c-notes":"notes","#c-lesson":"lessonUrl","#c-song":"songUrl","#c-ug":"ugUrl","#c-lyrics":"lyrics","#c-lyrurl":"lyricsUrl"};
+    for(const [sel,k] of Object.entries(map)){ const el=$(sel); if(el) el.addEventListener("input",()=>{draft[k]=el.value; setDirty();}); }
+    const key=$("#c-key"); if(key) key.addEventListener("input",()=>{draft.keyShift=Number(key.value); setDirty();});
+    const pos=$("#c-pos"); if(pos) pos.addEventListener("input",setDirty);
+    document.querySelectorAll("[data-rate]").forEach(b=>b.addEventListener("click",()=>setRating(openId,Number(b.dataset.rate))));
+    const pr=$("#c-prac"); if(pr) pr.addEventListener("change",()=>togglePractice(openId,pr.checked));
+    document.querySelectorAll(".part").forEach(row=>{
+      const i=Number(row.dataset.i);
+      row.querySelectorAll("[data-sf]").forEach(el=>el.addEventListener("input",()=>{draft.sections[i][el.dataset.sf]=el.value; setDirty();}));
+      row.querySelectorAll("[data-sec]").forEach(b=>b.addEventListener("click",()=>{
+        const a=draft.sections, act=b.dataset.sec;
+        if(act==="del") a.splice(i,1);
+        if(act==="up"&&i>0) [a[i-1],a[i]]=[a[i],a[i-1]];
+        if(act==="down"&&i<a.length-1) [a[i+1],a[i]]=[a[i],a[i+1]];
+        dirty=true; renderCard();
+      }));
+    });
+    const tpl=$("#tpl"); if(tpl) tpl.onclick=()=>{draft.sections=TEMPLATE.map(n=>({name:n,chords:"",note:""})); dirty=true; renderCard();};
+    const add=$("#add-sec"); if(add) add.onclick=()=>{draft.sections.push({name:"",chords:"",note:""}); dirty=true; renderCard(); const last=document.querySelector(".part:last-of-type input"); if(last) last.focus();};
+    const save=$("#save"); if(save) save.onclick=saveCard;
+    const del=$("#del"); if(del) del.onclick=()=>{
+      $("#delwrap").innerHTML=`<span class="confirm">Видалити «${esc(draft.title)}»? <button type="button" class="danger" id="del-yes">Так, видалити</button><button type="button" class="ghost" id="del-no">Скасувати</button></span>`;
+      $("#del-no").onclick=()=>renderCard();
+      $("#del-yes").onclick=async()=>{
+        try{ await db.doc("songs/"+openId).delete(); songs=songs.filter(s=>s.id!==openId); await writeOrder(sorted()); closeCard(); }
+        catch(e){ renderCard("Не вдалося видалити. Спробуй ще раз.","err"); }
+      };
+    };
+    const pin=$("#pdf-in"); if(pin) pin.onchange=uploadPdf;
+    document.querySelectorAll("[data-pdfdel]").forEach(b=>b.addEventListener("click",()=>{
+      const i=Number(b.dataset.pdfdel), wrap=document.querySelector(`[data-pdfwrap="${i}"]`);
+      wrap.innerHTML=`<span class="confirm">Видалити файл? <button type="button" class="danger" data-yes>Так</button><button type="button" class="ghost" data-no>Ні</button></span>`;
+      wrap.querySelector("[data-no]").onclick=()=>renderCard();
+      wrap.querySelector("[data-yes]").onclick=()=>removePdf(i);
+    }));
+  }
+
+  function bodyFrom(d){
+    return {title:d.title||"",artist:d.artist||"",order:d.order,tuning:d.tuning||"E",keyShift:Number(d.keyShift||0),bpm:String(d.bpm||""),
+      preset:d.preset||"",ctl:d.ctl||"",notes:d.notes||"",rating:rateOf(d),practiceLog:logOf(d),
+      lessonUrl:safeUrl(d.lessonUrl),songUrl:safeUrl(d.songUrl),ugUrl:safeUrl(d.ugUrl),lyrics:String(d.lyrics||""),lyricsUrl:safeUrl(d.lyricsUrl),rehearsal:!!d.rehearsal,vocals:vocsOf(d),
+      sections:(d.sections||[]).map(p=>({name:p.name||"",chords:p.chords||"",note:p.note||""})),
+      pdfs:(d.pdfs||[]).map(f=>({id:f.id,name:f.name||""}))};
+  }
+  async function saveCard(){
+    const st=$("#status"); if(st){st.textContent="Зберігаю…"; st.className="status";}
+    try{
+      const cur=songs.find(s=>s.id===openId); draft.order=cur?cur.order:draft.order;
+      const body=bodyFrom(draft);
+      await db.doc("songs/"+openId).set(body);
+      Object.assign(cur,body);
+      const want=Number($("#c-pos")?.value)||0, all=sorted(), now=all.findIndex(s=>s.id===openId)+1;
+      if(want&&want!==now) await moveTo(openId,want-1);
+      draft.order=songs.find(s=>s.id===openId).order; dirty=false;
+      renderCard("Збережено","ok");
+    }catch(e){ renderCard("Не вдалося зберегти. Перевір з'єднання і натисни ще раз.","err"); dirty=true; }
+  }
+  async function uploadPdf(e){
+    const f=e.target.files&&e.target.files[0]; if(!f) return;
+    const st=$("#status"); if(st){st.textContent="Завантажую PDF…"; st.className="status";}
+    try{
+      const r=await assets.upload(f,{type:"application/pdf"});
+      const pdfs=[...(songs.find(s=>s.id===openId).pdfs||[]),{id:r.id,name:f.name}];
+      await db.doc("songs/"+openId).update({pdfs});
+      songs.find(s=>s.id===openId).pdfs=pdfs; draft.pdfs=JSON.parse(JSON.stringify(pdfs));
+      renderCard("PDF прикріплено","ok");
+    }catch(err){
+      const code=err&&err.code;
+      const m=code==="too_large"?"Файл більший за 20 МБ. Стисни PDF і спробуй ще раз.":code==="unsupported_type"?"Це не PDF. Вибери файл .pdf.":code==="quota_or_state"?"Сховище сторінки заповнене. Видали старі файли.":"Не вдалося завантажити PDF. Спробуй ще раз.";
+      renderCard(m,"err");
+    }
+  }
+  async function removePdf(i){
+    const cur=songs.find(s=>s.id===openId); const pdfs=[...(cur.pdfs||[])]; const [f]=pdfs.splice(i,1);
+    try{ await db.doc("songs/"+openId).update({pdfs}); cur.pdfs=pdfs; draft.pdfs=JSON.parse(JSON.stringify(pdfs));
+      try{ await assets.delete(f.id); }catch(_){}
+      renderCard("Файл видалено","ok");
+    }catch(e){ renderCard("Не вдалося видалити файл.","err"); }
+  }
+
+  // learning
+  const CATS=[
+    {id:"warmup",title:"Розминка",sub:"Вправи на 10–15 хвилин перед грою: хроматика, розтяжка пальців, синхронізація рук під метроном."},
+    {id:"technique",title:"Техніка",sub:"Альтернативний штрих, глушіння долонею, бенди, вібрато, легато, ритмічні патерни."},
+    {id:"theory",title:"Теорія",sub:"Акорди та їх побудова, пентатоніка й лади, тональності, ритм і розмір."}
+  ];
+  let lessons=[], lessonsLoaded=false, learnMsg={};
+  const isYT=u=>/(^|\.)youtube\.com$|(^|\.)youtu\.be$/.test((()=>{try{return new URL(u).hostname}catch(_){return ""}})());
+  function renderLearn(){
+    const box=$("#learn-cats"); if(!box) return;
+    // keep typed values in add forms across re-renders
+    const keep={}; CATS.forEach(c=>{keep[c.id]={t:$("#lt-"+c.id)?.value||"",u:$("#lu-"+c.id)?.value||"",n:$("#ln-"+c.id)?.value||""}});
+    box.innerHTML=CATS.map(c=>{
+      const items=lessons.filter(l=>l.category===c.id).sort((a,b)=>String(a.created||"").localeCompare(String(b.created||"")));
+      const list=items.map(l=>{
+        const u=safeUrl(l.url), pdf=l.pdfId?blobUrl(l.pdfId):"";
+        const kind=pdf&&!u?`<span class="kind pdf">PDF</span>`:(u&&isYT(u)?`<span class="kind">Відео</span>`:(u?`<span class="kind">Посилання</span>`:`<span class="kind">Нотатка</span>`));
+        const main=u||pdf;
+        return `<div class="item">${kind}
+          <span><b>${main?`<a href="${esc(main)}" target="_blank" rel="noopener">${esc(l.title||"Без назви")}</a>`:esc(l.title||"Без назви")}</b>${l.note?`<small>${esc(l.note)}</small>`:""}</span>
+          <span class="acts" data-lwrap="${esc(l.id)}">${pdf&&u?`<a class="btn" href="${esc(pdf)}" target="_blank" rel="noopener">PDF</a>`:""}${canWrite?`<button type="button" class="ghost" data-ldel="${esc(l.id)}">Видалити</button>`:""}</span></div>`;
+      }).join("");
+      const form=canWrite&&db?`<form class="addform" data-cat="${c.id}">
+          <label class="f">Назва<input id="lt-${c.id}" placeholder="Наприклад: хроматика 1-2-3-4" value="${esc(keep[c.id].t)}"></label>
+          <label class="f">Посилання (YouTube чи інше)<input id="lu-${c.id}" type="url" placeholder="https://…" value="${esc(keep[c.id].u)}"></label>
+          ${assets?`<label class="f">PDF<input id="lp-${c.id}" type="file" accept="application/pdf"></label>`:"<span></span>"}
+          <label class="f w">Нотатка<input id="ln-${c.id}" placeholder="Темп, на що звернути увагу" value="${esc(keep[c.id].n)}"></label>
+          <span class="w" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="submit" class="primary">Додати в «${c.title}»</button><span class="status ${learnMsg[c.id]?.cls||""}">${esc(learnMsg[c.id]?.text||"")}</span></span>
+        </form>`:"";
+      return `<section class="lcat" id="l-${c.id}">
+        <div class="block-head"><h2>${c.title}</h2><span class="muted">${items.length} ${plural(items.length,"матеріал","матеріали","матеріалів")}</span></div>
+        <p class="sub">${c.sub}</p>
+        <div class="items">${list||`<p class="muted">Тут ще порожньо. ${canWrite?"Додай посилання на відео або PDF з нотами формою нижче.":""}</p>`}</div>
+        ${form}
+      </section>`;
+    }).join("");
+    $("#learn-status").hidden=lessonsLoaded;
+    box.querySelectorAll("form.addform").forEach(f=>f.addEventListener("submit",addLesson));
+    box.querySelectorAll("[data-ldel]").forEach(b=>b.addEventListener("click",()=>{
+      const w=box.querySelector(`[data-lwrap="${b.dataset.ldel}"]`);
+      w.innerHTML=`<span class="confirm">Видалити? <button type="button" class="danger" data-y>Так</button><button type="button" class="ghost" data-n>Ні</button></span>`;
+      w.querySelector("[data-n]").onclick=renderLearn;
+      w.querySelector("[data-y]").onclick=()=>delLesson(b.dataset.ldel);
+    }));
+  }
+  async function addLesson(e){
+    e.preventDefault(); const cat=e.currentTarget.dataset.cat;
+    const title=$("#lt-"+cat).value.trim(), urlRaw=$("#lu-"+cat).value.trim(), note=$("#ln-"+cat).value.trim();
+    const file=$("#lp-"+cat)?.files?.[0];
+    const url=urlRaw?safeUrl(urlRaw):"";
+    if(urlRaw&&!url){ learnMsg[cat]={text:"Посилання має починатися з https://",cls:"err"}; return renderLearn(); }
+    if(!url&&!file&&!note){ learnMsg[cat]={text:"Додай посилання, PDF або нотатку.",cls:"err"}; return renderLearn(); }
+    learnMsg[cat]={text:file?"Завантажую PDF…":"Зберігаю…"}; renderLearn();
+    try{
+      let pdfId="", pdfName="";
+      if(file){ const r=await assets.upload(file,{type:"application/pdf"}); pdfId=r.id; pdfName=file.name; }
+      const body={category:cat,title:title||pdfName||"Без назви",url,pdfId,pdfName,note,created:new Date().toISOString()};
+      const ref=await db.collection("lessons").add(body);
+      if(!lessons.find(l=>l.id===ref.id)) lessons.push({id:ref.id,...body});
+      ["#lt-","#lu-","#ln-"].forEach(p=>{const el=$(p+cat); if(el) el.value="";});
+      learnMsg[cat]={text:"Додано",cls:"ok"};
+    }catch(err){
+      const code=err&&err.code;
+      learnMsg[cat]={text:code==="too_large"?"PDF більший за 20 МБ.":code==="unsupported_type"?"Це не PDF.":"Не вдалося зберегти. Спробуй ще раз.",cls:"err"};
+    }
+    renderLearn();
+  }
+  async function delLesson(id){
+    const l=lessons.find(x=>x.id===id); if(!l) return;
+    try{ await db.doc("lessons/"+id).delete(); lessons=lessons.filter(x=>x.id!==id);
+      if(l.pdfId&&assets){ try{ await assets.delete(l.pdfId); }catch(_){} }
+    }catch(e){ learnMsg[l.category]={text:"Не вдалося видалити.",cls:"err"}; }
+    renderLearn();
+  }
+
+  // ---------- Fretboard trainer ----------
+  const SH=["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
+  const FL=["C","D♭","D","E♭","E","F","G♭","G","A♭","A","B♭","B"];
+  const SOLF={0:"до",2:"ре",4:"мі",5:"фа",7:"соль",9:"ля",11:"сі"};
+  const TUNE={E:{open:[64,59,55,50,45,40],names:["e","B","G","D","A","E"]},D:{open:[64,59,55,50,45,38],names:["e","B","G","D","A","D"]}};
+  const INLAY=[3,5,7,9,12,15,17,19,21,24];
+  const IVS=[[1,"м2","мала секунда"],[2,"в2","велика секунда"],[3,"м3","мала терція"],[4,"в3","велика терція"],[5,"ч4","чиста кварта"],[6,"тт","тритон"],[7,"ч5","чиста квінта"],[8,"м6","мала секста"],[9,"в6","велика секста"],[10,"м7","мала септима"],[11,"в7","велика септима"],[12,"ч8","октава"]];
+  const CHORDS=[["maj","мажор","",[0,4,7]],["min","мінор","m",[0,3,7]],["dim","зменшений","dim",[0,3,6]],["aug","збільшений","aug",[0,4,8]],["sus2","sus2","sus2",[0,2,7]],["sus4","sus4","sus4",[0,5,7]],["7","домінантсептакорд","7",[0,4,7,10]],["maj7","великий мажорний септакорд","maj7",[0,4,7,11]],["m7","малий мінорний септакорд","m7",[0,3,7,10]]];
+  const DEG={0:"1",1:"♭2",2:"2",3:"♭3",4:"3",5:"4",6:"♭5",7:"5",8:"♯5",9:"6",10:"♭7",11:"7"};
+  const noteName=n=>SH[n]===FL[n]?`${SH[n]} (${SOLF[n]})`:`${SH[n]} / ${FL[n]}`;
+  const short=n=>SH[n];
+  const rnd=a=>a[Math.floor(Math.random()*a.length)];
+  const blankStats=()=>({ok:0,bad:0,streak:0});
+  const tr={kind:"notes",phase:"idle",task:null,sel:new Set(),last:"",stats:{notes:blankStats(),intervals:blankStats(),chords:blankStats()}};
+  const tset={kind:"notes",mode:"one",notes:"nat",tuning:"E",range:24,strings:[0,1,2,3,4,5],ivs:[3,4,5,7,12],dir:"up",iroot:"low",chords:["maj","min"],croot:"65",bass:"root"};
+  try{
+    Object.assign(tset,JSON.parse(localStorage.getItem("trainerSet")||"{}"));
+    const st=JSON.parse(localStorage.getItem("trainerStats")||"{}");
+    if(st&&typeof st.ok==="number") tr.stats.notes=Object.assign(blankStats(),st); else for(const k in tr.stats) if(st&&st[k]) tr.stats[k]=Object.assign(blankStats(),st[k]);
+  }catch(_){}
+  tset.range=Number(tset.range)===12?12:24;
+  const cleanNums=(a,ok,def)=>{const r=Array.isArray(a)?[...new Set(a.map(Number).filter(ok))].sort((x,y)=>x-y):[]; return r.length?r:def;};
+  tset.strings=cleanNums(tset.strings,n=>n>=0&&n<=5,[0,1,2,3,4,5]);
+  tset.ivs=cleanNums(tset.ivs,n=>n>=1&&n<=12,[3,4,5,7,12]);
+  tset.chords=Array.isArray(tset.chords)?tset.chords.filter(id=>CHORDS.some(c=>c[0]===id)):["maj","min"]; if(!tset.chords.length) tset.chords=["maj","min"];
+  if(!["notes","intervals","chords"].includes(tset.kind)) tset.kind="notes";
+  tr.kind=tset.kind;
+  const saveT=()=>{ try{ localStorage.setItem("trainerSet",JSON.stringify(tset)); localStorage.setItem("trainerStats",JSON.stringify(tr.stats)); }catch(_){} };
+  const names=()=>TUNE[tset.tuning].names;
+  const strLabel=s=>`${s+1} (${names()[s]})`;
+  const pitch=(s,f)=>TUNE[tset.tuning].open[s]+f;
+  const pc=p=>((p%12)+12)%12;
+  const pool=()=>tset.notes==="nat"?[0,2,4,5,7,9,11]:[0,1,2,3,4,5,6,7,8,9,10,11];
+  const fretsFor=(s,n)=>{const r=[]; for(let f=0;f<=tset.range;f++) if(pc(pitch(s,f))===n) r.push(f); return r;};
+  const posOf=(k)=>k.split("-").map(Number);
+  const where=(s,f)=>`${s+1} струна, ${f===0?"відкрита":f+" лад"}`;
+
+  function buildBoard(){
+    const fb=$("#fb"), max=tset.range;
+    fb.style.gridTemplateColumns=`34px var(--cw) repeat(${max},var(--cw))`;
+    fb.style.minWidth=`calc(34px + ${max+1}*var(--cw))`;
+    let h="";
+    for(let s=0;s<6;s++){
+      h+=`<span class="lab" data-lab="${s}">${names()[s]}</span>`;
+      for(let f=0;f<=max;f++) h+=`<span class="cell${f===0?" open":""}${INLAY.includes(f)?" inlay":""}" style="--sw:${(1+s*0.45).toFixed(2)}px"><button type="button" class="dot" data-s="${s}" data-f="${f}" aria-label="Струна ${strLabel(s)}, лад ${f}" disabled></button></span>`;
+    }
+    h+=`<span></span>`;
+    for(let f=0;f<=max;f++) h+=`<span class="fnum${f===12||f===24?" mk2":INLAY.includes(f)?" mk":""}">${f}</span>`;
+    fb.innerHTML=h; paintBoard();
+  }
+
+  // what each dot looks like, per kind
+  function dotView(s,f){
+    const k=s+"-"+f, t=tr.task, on=tr.sel.has(k), checked=tr.phase==="checked", answer=tr.phase==="answer";
+    if(!t) return {disabled:true,off:false};
+    if(tr.kind==="notes"){
+      const tgt=t.strings.includes(s);
+      const v={disabled:!(answer&&tgt),off:!tgt};
+      if(checked&&tgt){ const c=t.correct.has(k); if(on&&c) Object.assign(v,{cls:"good",text:f}); else if(on) Object.assign(v,{cls:"bad",text:f}); else if(c) Object.assign(v,{cls:"miss",text:f}); }
+      else if(on) v.cls="sel";
+      return v;
+    }
+    const isRoot=s===t.rs&&f===t.rf;
+    if(isRoot) return {cls:"root",text:short(pc(pitch(s,f))),disabled:true,off:false};
+    if(tr.kind==="intervals"){
+      const v={disabled:!answer,off:false};
+      if(checked){ if(on) Object.assign(v,{cls:t.okKeys.has(k)?"good":"bad",text:short(pc(pitch(s,f)))}); else if(t.showMiss&&t.answers.has(k)) Object.assign(v,{cls:"miss",text:short(pc(pitch(s,f)))}); }
+      else if(on) Object.assign(v,{cls:"sel",text:""});
+      return v;
+    }
+    // chords
+    const blockedRow=s===t.rs||(tset.bass==="root"&&s>t.rs);
+    const v={disabled:!answer||blockedRow,off:blockedRow};
+    if(checked){
+      if(on) Object.assign(v,{cls:t.badKeys.has(k)?"bad":"good",text:short(pc(pitch(s,f)))});
+      else if(t.showMiss&&t.suggest.has(k)) Object.assign(v,{cls:"miss",text:short(pc(pitch(s,f))),off:false});
+    } else if(on) v.cls="sel";
+    return v;
+  }
+  function paintBoard(){
+    const t=tr.task, active=new Set(t?(tr.kind==="notes"?t.strings:[t.rs]):[]);
+    document.querySelectorAll("#fb .lab").forEach(l=>l.classList.toggle("active",active.has(Number(l.dataset.lab))));
+    document.querySelectorAll("#fb .dot").forEach(d=>{
+      const s=Number(d.dataset.s), f=Number(d.dataset.f), v=dotView(s,f);
+      d.className="dot"+(v.cls?" "+v.cls:""); d.textContent=v.text??"";
+      d.disabled=!!v.disabled; d.parentElement.classList.toggle("row-off",tr.phase!=="idle"&&!!v.off);
+      d.setAttribute("aria-pressed",String(tr.sel.has(s+"-"+f)));
+    });
+  }
+  const KIND_TITLE={notes:"Ноти на грифі",intervals:"Інтервали",chords:"Акорди"};
+  function setTask(html,sub){ $("#t-text").innerHTML=`<span class="task-kicker">${sub}</span><b>${html}</b>`; }
+  function idleText(){
+    const how={notes:"Покажу ноту і струну — познач усі лади, де вона є.",intervals:"Покажу ноту на грифі й інтервал — познач потрібну ноту на іншій струні.",chords:"Покажу корінь на грифі й тип акорду — добудуй акорд на струнах вище."}[tr.kind];
+    $("#t-text").innerHTML=`<span class="task-kicker">${KIND_TITLE[tr.kind]}</span><b>Натисни «Почати тренування»</b><span class="muted">${how}</span>`;
+  }
+  function showButtons(){
+    const p=tr.phase;
+    $("#t-start").hidden=p!=="idle"; $("#t-check").hidden=p!=="answer"; $("#t-next").hidden=p!=="checked"; $("#t-stop").hidden=p==="idle"; $("#t-clear").hidden=p!=="answer";
+  }
+  function renderScore(){ const st=tr.stats[tr.kind]; $("#t-ok").textContent=st.ok; $("#t-bad").textContent=st.bad; $("#t-streak").textContent=st.streak; }
+  function result(ok,html){ const r=$("#t-result"); r.hidden=false; r.className="t-result "+(ok?"ok":"err"); r.innerHTML=html; const st=tr.stats[tr.kind]; if(ok){st.ok++;st.streak++;}else{st.bad++;st.streak=0;} saveT(); renderScore(); }
+
+  // --- notes
+  function pickStrings(){
+    const all=tset.strings.slice();
+    if(tset.mode==="all") return all;
+    const k=tset.mode==="one"?1:Math.min(all.length,2+Math.floor(Math.random()*2));
+    for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]];}
+    return all.slice(0,k).sort((a,b)=>a-b);
+  }
+  function taskNotes(){
+    let note,strings,key,g=0;
+    do{ note=rnd(pool()); strings=pickStrings(); key=note+":"+strings.join(","); }while(key===tr.last&&g++<10);
+    tr.last=key;
+    const correct=new Set(); strings.forEach(s=>fretsFor(s,note).forEach(f=>correct.add(s+"-"+f)));
+    tr.task={note,strings,correct};
+    const w=tset.mode==="all"&&strings.length===6?"на всіх шести струнах":strings.length===1?`на струні ${strLabel(strings[0])}`:`на струнах ${strings.map(strLabel).join(", ")}`;
+    setTask(`Нота <span class="nt">${noteName(note)}</span> ${w}`,`Познач усі лади від 0 до ${tset.range}`);
+  }
+  function checkNotes(){
+    const t=tr.task, bad=[...tr.sel].filter(k=>!t.correct.has(k)), miss=[...t.correct].filter(k=>!tr.sel.has(k));
+    if(!bad.length&&!miss.length) return result(true,`Правильно! ${noteName(t.note)}: ${t.strings.map(s=>`струна ${strLabel(s)} — лади ${fretsFor(s,t.note).join(", ")}`).join("; ")}.`);
+    const ws=t.strings.filter(s=>[...bad,...miss].some(k=>k.startsWith(s+"-")));
+    result(false,`Є помилка. Нота ${noteName(t.note)}:`+ws.map(s=>{const b=bad.filter(k=>k.startsWith(s+"-")).map(k=>k.split("-")[1]); return `<small>Струна ${strLabel(s)}: правильні лади <b>${fretsFor(s,t.note).join(", ")}</b>${b.length?` · зайві: ${b.join(", ")}`:""}</small>`;}).join("")+`<small>Пунктирні кружечки — пропущені лади, червоні — зайві.</small>`);
+  }
+
+  // --- intervals
+  function taskIntervals(){
+    const rootStrings=tset.iroot==="low"?[3,4,5]:[0,1,2,3,4,5];
+    for(let g=0;g<200;g++){
+      const n=rnd(tset.ivs), dir=tset.dir==="both"?rnd(["up","down"]):tset.dir;
+      const rs=rnd(rootStrings), rf=Math.floor(Math.random()*(Math.min(tset.range,15)+1));
+      const rp=pitch(rs,rf); if(!pool().includes(pc(rp))) continue;
+      const target=rp+(dir==="up"?n:-n), answers=new Set();
+      for(let s=0;s<6;s++){ if(s===rs) continue; for(let f=0;f<=tset.range;f++) if(pitch(s,f)===target) answers.add(s+"-"+f); }
+      if(!answers.size) continue;
+      const key=`${n}${dir}${rs}${rf}`; if(key===tr.last) continue; tr.last=key;
+      const iv=IVS.find(x=>x[0]===n);
+      tr.task={rs,rf,n,dir,answers,target,okKeys:new Set(),showMiss:false};
+      setTask(`<span class="nt">${iv[2]}</span> ${dir==="up"?"вгору":"вниз"} від ${noteName(pc(rp))}`,`Корінь: ${where(rs,rf)} · ${iv[1]} = ${n} ${plural(n,"півтон","півтони","півтонів")}`);
+      return;
+    }
+    setTask("Не вдалося скласти завдання","Зміни налаштування: діапазон ладів або набір інтервалів");
+  }
+  function checkIntervals(){
+    const t=tr.task, sel=[...tr.sel];
+    if(!sel.length){ const r=$("#t-result"); r.hidden=false; r.className="t-result err"; r.innerHTML="Познач одну ноту на грифі."; tr.phase="answer"; return false; }
+    const [s,f]=posOf(sel[0]), iv=IVS.find(x=>x[0]===t.n);
+    t.showMiss=true;
+    if(s===t.rs){ result(false,`На тій самій струні інтервал не будується — вибери ноту на іншій струні.<small>Правильні місця: ${[...t.answers].map(k=>{const [a,b]=posOf(k);return where(a,b)}).join("; ")}.</small>`); return true; }
+    const diff=pitch(s,f)-pitch(t.rs,t.rf), want=t.dir==="up"?t.n:-t.n;
+    if(diff===want){ t.okKeys.add(sel[0]); result(true,`Правильно! ${iv[2]} ${t.dir==="up"?"вгору":"вниз"}: ${noteName(pc(pitch(t.rs,t.rf)))} → ${noteName(pc(t.target))} (${where(s,f)}).`); return true; }
+    const ad=Math.abs(diff), got=IVS.find(x=>x[0]===ad);
+    const gotTxt=ad===0?"та сама нота (унісон)":got?`${got[2]} ${diff>0?"вгору":"вниз"}`:`${ad} ${plural(ad,"півтон","півтони","півтонів")} ${diff>0?"вгору":"вниз"} — ширше за октаву`;
+    result(false,`Не той інтервал. Ти позначив ${noteName(pc(pitch(s,f)))} — це ${gotTxt}.<small>Потрібно: ${iv[2]} (${t.n} ${plural(t.n,"півтон","півтони","півтонів")}) ${t.dir==="up"?"вгору":"вниз"} → ${noteName(pc(t.target))}. Правильні місця: ${[...t.answers].map(k=>{const [a,b]=posOf(k);return where(a,b)}).join("; ")}.</small>`);
+    return true;
+  }
+
+  // --- chords
+  function chordPcs(root,ch){ return ch[3].map(i=>(root+i)%12); }
+  function suggestVoicing(rs,rf,pcs,bassRoot){
+    const rp=pitch(rs,rf), strs=[]; for(let s=rs-1;s>=0;s--) strs.push(s);
+    const lo=Math.max(0,rf-3), hi=Math.min(tset.range,rf+4); let best=null;
+    const opts=strs.map(s=>{const o=[null]; for(let f=lo;f<=hi;f++){const p=pitch(s,f); if(pcs.includes(pc(p))&&(!bassRoot||p>=rp)) o.push(f);} if(rf<=4&&pcs.includes(pc(pitch(s,0)))&&(!bassRoot||pitch(s,0)>=rp)&&!o.includes(0)) o.push(0); return o;});
+    const cur=[];
+    (function rec(i){
+      if(i===strs.length){
+        const chosen=cur.map((f,j)=>f===null?null:[strs[j],f]).filter(Boolean);
+        const cov=new Set([pc(rp),...chosen.map(([s,f])=>pc(pitch(s,f)))]); if(!pcs.every(p=>cov.has(p))) return;
+        const fr=[rf,...chosen.map(c=>c[1])].filter(f=>f>0); const span=fr.length?Math.max(...fr)-Math.min(...fr):0; if(span>4) return;
+        let gaps=0,seen=false,ended=false; cur.forEach(f=>{ if(f!==null){ if(ended) gaps++; seen=true; } else if(seen) ended=true; });
+        if(cur[0]===null) gaps+=1;
+        const score=chosen.length*2-span*1.5-gaps*4;
+        if(!best||score>best.score) best={score,chosen};
+        return;
+      }
+      for(const f of opts[i]){ cur.push(f); rec(i+1); cur.pop(); }
+    })(0);
+    return best?best.chosen:null;
+  }
+  function taskChords(){
+    const rsOpts={"65":[5,4],"654":[5,4,3],"6":[5],"5":[4]}[tset.croot]||[5,4];
+    for(let g=0;g<200;g++){
+      const cid=rnd(tset.chords), ch=CHORDS.find(c=>c[0]===cid), rs=rnd(rsOpts), rf=Math.floor(Math.random()*(Math.min(12,tset.range-2)+1));
+      const root=pc(pitch(rs,rf)); if(!pool().includes(root)) continue;
+      const pcs=chordPcs(root,ch), sug=suggestVoicing(rs,rf,pcs,tset.bass==="root"); if(!sug) continue;
+      const key=`${ch[0]}${rs}${rf}`; if(key===tr.last) continue; tr.last=key;
+      tr.task={rs,rf,ch,root,pcs,suggest:new Set(sug.map(([s,f])=>s+"-"+f)),badKeys:new Set(),showMiss:false};
+      setTask(`<span class="nt">${short(root)}${ch[2]}</span> — ${ch[1]} від ${noteName(root)}`,`Корінь: ${where(rs,rf)} · формула ${ch[3].map(i=>DEG[i]).join("–")} · звуки ${pcs.map(short).join(" – ")}`);
+      return;
+    }
+    setTask("Не вдалося скласти завдання","Зміни налаштування: діапазон ладів або типи акордів");
+  }
+  function checkChords(){
+    const t=tr.task, rp=pitch(t.rs,t.rf), sel=[...tr.sel].map(posOf);
+    if(!sel.length){ const r=$("#t-result"); r.hidden=false; r.className="t-result err"; r.innerHTML="Познач ноти акорду на інших струнах."; tr.phase="answer"; return false; }
+    const bad=[], low=[];
+    sel.forEach(([s,f])=>{ const p=pitch(s,f), k=s+"-"+f; if(!t.pcs.includes(pc(p))) { bad.push([s,f]); t.badKeys.add(k);} else if(tset.bass==="root"&&p<rp){ low.push([s,f]); t.badKeys.add(k);} });
+    const cov=new Set([pc(rp),...sel.filter(([s,f])=>!t.badKeys.has(s+"-"+f)).map(([s,f])=>pc(pitch(s,f)))]);
+    const missing=t.pcs.filter(p=>!cov.has(p));
+    t.showMiss=true;
+    const nm=`${short(t.root)}${t.ch[2]}`;
+    if(!bad.length&&!low.length&&!missing.length){
+      const fr=[t.rf,...sel.map(x=>x[1])].filter(f=>f>0), span=fr.length?Math.max(...fr)-Math.min(...fr):0;
+      result(true,`Правильно! ${nm} = ${t.pcs.map(short).join(" – ")}.${span>4?`<small>Звучить правильно, але розтяжка ${span} ${plural(span,"лад","лади","ладів")} — пошукай компактнішу аплікатуру.</small>`:""}`);
+      t.showMiss=false; return true;
+    }
+    const lines=[];
+    if(bad.length) lines.push(`Зайві звуки (не з акорду): ${bad.map(([s,f])=>`${short(pc(pitch(s,f)))} — ${where(s,f)}`).join("; ")}.`);
+    if(low.length) lines.push(`Нижче за корінь: ${low.map(([s,f])=>`${short(pc(pitch(s,f)))} — ${where(s,f)}`).join("; ")}. Корінь має бути найнижчою нотою.`);
+    if(missing.length) lines.push(`Бракує: ${missing.map(p=>`${short(p)} (${DEG[(p-t.root+12)%12]})`).join(", ")}.`);
+    result(false,`Акорд ${nm} = ${t.pcs.map(short).join(" – ")} (${t.ch[3].map(i=>DEG[i]).join("–")}).`+lines.map(l=>`<small>${l}</small>`).join("")+`<small>Пунктиром показано один зручний варіант аплікатури.</small>`);
+    return true;
+  }
+
+  // --- flow
+  function newTask(){
+    tr.sel=new Set(); tr.phase="answer"; $("#t-result").hidden=true;
+    ({notes:taskNotes,intervals:taskIntervals,chords:taskChords})[tr.kind]();
+    showButtons(); paintBoard();
+    const first=document.querySelector("#fb .dot.root")||document.querySelector("#fb .dot:not(:disabled)"); if(first) first.scrollIntoView({block:"nearest",inline:"center"});
+  }
+  function checkTask(){
+    tr.phase="checked";
+    const done=({notes:()=>(checkNotes(),true),intervals:checkIntervals,chords:checkChords})[tr.kind]();
+    if(done===false) tr.phase="answer";
+    showButtons(); paintBoard();
+  }
+  function stopTrainer(){ tr.phase="idle"; tr.task=null; tr.sel=new Set(); $("#t-result").hidden=true; idleText(); showButtons(); paintBoard(); }
+  $("#fb").addEventListener("click",e=>{
+    const d=e.target.closest(".dot"); if(!d||d.disabled||tr.phase!=="answer") return;
+    const s=Number(d.dataset.s), k=d.dataset.s+"-"+d.dataset.f;
+    if(tr.sel.has(k)) tr.sel.delete(k);
+    else if(tr.kind==="intervals"){ tr.sel=new Set([k]); }
+    else if(tr.kind==="chords"){ [...tr.sel].forEach(x=>{ if(x.startsWith(s+"-")) tr.sel.delete(x); }); tr.sel.add(k); }
+    else tr.sel.add(k);
+    paintBoard();
+  });
+  $("#t-start").onclick=newTask; $("#t-next").onclick=newTask; $("#t-check").onclick=checkTask; $("#t-stop").onclick=stopTrainer;
+  $("#t-clear").onclick=()=>{ tr.sel=new Set(); paintBoard(); };
+  $("#t-reset").onclick=()=>{ tr.stats[tr.kind]=blankStats(); saveT(); renderScore(); };
+
+  function setKind(k){
+    tr.kind=tset.kind=k; saveT();
+    document.querySelectorAll(".seg [data-kind]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.kind===k)));
+    ["notes","intervals","chords"].forEach(x=>$("#p-"+x).hidden=x!==k);
+    tr.last=""; stopTrainer(); renderScore();
+  }
+  document.querySelectorAll(".seg [data-kind]").forEach(b=>b.addEventListener("click",()=>setKind(b.dataset.kind)));
+
+  // pickers
+  function toggleIn(arr,v,min=1){ return arr.includes(v)?(arr.length>min?arr.filter(x=>x!==v):arr):[...arr,v]; }
+  function renderPickers(){
+    const n=tset.strings.length;
+    $("#t-strings").innerHTML=[0,1,2,3,4,5].map(s=>`<button type="button" class="sbtn" data-str="${s}" aria-pressed="${tset.strings.includes(s)}">${s+1} · ${names()[s]}</button>`).join("");
+    $("#t-str-hint").textContent=tset.mode==="some"&&n<2?"Для режиму «Кілька струн» вибери щонайменше 2 струни — поки завдання буде на одній.":tset.mode==="all"?`Режим «Увесь гриф»: нота шукається одразу на ${n===6?"всіх шести струнах":"вибраних струнах ("+n+")"}.`:"";
+    $("#i-list").innerHTML=IVS.map(([n,sh,full])=>`<button type="button" class="sbtn" data-iv="${n}" title="${full}, ${n} пт" aria-pressed="${tset.ivs.includes(n)}">${sh}</button>`).join("");
+    $("#c-list").innerHTML=CHORDS.map(([id,full,suf])=>`<button type="button" class="sbtn" data-ch="${id}" title="${full}" aria-pressed="${tset.chords.includes(id)}">${suf?"C"+suf:"C"}</button>`).join("");
+  }
+  const changed=()=>{ saveT(); renderPickers(); if(tr.phase!=="idle") newTask(); };
+  $("#t-strings").addEventListener("click",e=>{const b=e.target.closest("[data-str]"); if(!b) return; tset.strings=toggleIn(tset.strings,Number(b.dataset.str)).sort((a,b)=>a-b); changed();});
+  $("#t-str-all").onclick=()=>{tset.strings=[0,1,2,3,4,5]; changed();};
+  $("#t-str-low").onclick=()=>{tset.strings=[3,4,5]; changed();};
+  $("#t-str-high").onclick=()=>{tset.strings=[0,1,2]; changed();};
+  $("#i-list").addEventListener("click",e=>{const b=e.target.closest("[data-iv]"); if(!b) return; tset.ivs=toggleIn(tset.ivs,Number(b.dataset.iv)).sort((a,b)=>a-b); changed();});
+  $("#i-all").onclick=()=>{tset.ivs=IVS.map(x=>x[0]); changed();};
+  $("#i-basic").onclick=()=>{tset.ivs=[3,4,5,7,12]; changed();};
+  $("#c-list").addEventListener("click",e=>{const b=e.target.closest("[data-ch]"); if(!b) return; tset.chords=toggleIn(tset.chords,b.dataset.ch); changed();});
+  $("#c-all").onclick=()=>{tset.chords=CHORDS.map(c=>c[0]); changed();};
+  $("#c-triads").onclick=()=>{tset.chords=["maj","min"]; changed();};
+  const SELS=[["#t-mode","mode"],["#t-notes","notes"],["#t-tuning","tuning"],["#t-range","range"],["#i-dir","dir"],["#i-root","iroot"],["#c-root","croot"],["#c-bass","bass"]];
+  SELS.forEach(([sel,k])=>{ $(sel).value=String(tset[k]); $(sel).addEventListener("change",()=>{ tset[k]=k==="range"?Number($(sel).value):$(sel).value; if(k==="range"||k==="tuning") buildBoard(); changed(); }); });
+  document.addEventListener("keydown",e=>{
+    if($("#view-trainer").hidden||e.key!=="Enter"||e.target.closest("select,input,textarea,button")) return;
+    if(tr.phase==="answer"){ e.preventDefault(); checkTask(); } else if(tr.phase==="checked"){ e.preventDefault(); newTask(); }
+  });
+  buildBoard(); renderPickers(); setKind(tset.kind);
+
+  // ---------- Cheat sheet modal ----------
+  let cheat=null, cheatLoaded=false, cheatEdit=false, cheatMsg=null, cheatOpener=null;
+  function inlineMd(s){ return esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`([^`]+)`/g,"<code>$1</code>"); }
+  function mdToHtml(src){
+    const lines=String(src||"").replace(/\r/g,"").split("\n"); let out="", i=0;
+    while(i<lines.length){
+      const l=lines[i];
+      if(!l.trim()){ i++; continue; }
+      let m;
+      if((m=/^(#{1,3})\s+(.*)$/.exec(l))){ out+=m[1].length===1?`<h2>${inlineMd(m[2])}</h2>`:`<h3>${inlineMd(m[2])}</h3>`; i++; continue; }
+      if(/^\s*\|/.test(l)){
+        const rows=[]; while(i<lines.length&&/^\s*\|/.test(lines[i])) rows.push(lines[i++]);
+        const cells=r=>r.trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim());
+        const body=rows.filter(r=>!/^\s*\|?\s*:?-{2,}/.test(r));
+        out+=`<div class="tbl"><table><thead><tr>${cells(body[0]).map(c=>`<th>${inlineMd(c)}</th>`).join("")}</tr></thead><tbody>${body.slice(1).map(r=>`<tr>${cells(r).map(c=>`<td class="wrap">${inlineMd(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+        continue;
+      }
+      if(/^\s*[-*]\s+/.test(l)){ let h=""; while(i<lines.length&&/^\s*[-*]\s+/.test(lines[i])) h+=`<li>${inlineMd(lines[i++].replace(/^\s*[-*]\s+/,""))}</li>`; out+=`<ul>${h}</ul>`; continue; }
+      if(/^\s*\d+[.)]\s+/.test(l)){ let h=""; while(i<lines.length&&/^\s*\d+[.)]\s+/.test(lines[i])) h+=`<li>${inlineMd(lines[i++].replace(/^\s*\d+[.)]\s+/,""))}</li>`; out+=`<ol>${h}</ol>`; continue; }
+      let p=[]; while(i<lines.length&&lines[i].trim()&&!/^(#{1,3}\s|\s*\||\s*[-*]\s|\s*\d+[.)]\s)/.test(lines[i])) p.push(inlineMd(lines[i++]));
+      out+=`<p>${p.join("<br>")}</p>`;
+    }
+    return out;
+  }
+  function renderCheat(){
+    const body=$("#cheat-body"), tools=$("#cheat-tools");
+    const has=cheat&&(cheat.text||cheat.pdfId||cheat.url);
+    const pdf=cheat&&cheat.pdfId?blobUrl(cheat.pdfId):"", url=cheat?safeUrl(cheat.url):"";
+    tools.innerHTML=[`<a class="btn" href="${esc(pdf||"cheat/music_cheatsheet.pdf")}" target="_blank" rel="noopener">Відкрити PDF</a>`,(url?`<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Окрема сторінка</a>`:""),
+      canWrite&&db&&!cheatEdit?`<button type="button" id="cheat-edit">Додати нотатки</button>`:""].join(" ");
+    if(!cheatLoaded&&db){ body.innerHTML=`<p class="muted">Завантажую шпаргалку…</p>`; }
+    else if(cheatEdit){
+      body.innerHTML=`<form class="cs" id="cheat-form" style="display:grid;gap:10px">
+        <p class="note">Текст підтримує прості позначки: <code># Заголовок</code>, <code>- пункт</code>, <code>1. пункт</code>, <code>**жирний**</code> і таблиці з рядками <code>| A | B |</code>.</p>
+        <label class="f">Нотатки над аркушем<textarea id="cheat-text">${esc(cheat?.text||"")}</textarea></label>
+        <label class="f">Посилання на окрему сторінку (необов'язково)<input id="cheat-url" type="url" value="${esc(cheat?.url||"")}" placeholder="https://claude.ai/artifact/…"></label>
+        ${assets?`<label class="f">Замінити PDF (необов'язково)<input id="cheat-pdf" type="file" accept="application/pdf"></label>`:""}
+        <span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="submit" class="primary">Зберегти</button><button type="button" class="ghost" id="cheat-cancel">Скасувати</button><span class="status ${cheatMsg?.cls||""}">${esc(cheatMsg?.text||"")}</span></span>
+      </form>`;
+      $("#cheat-cancel").onclick=()=>{cheatEdit=false; cheatMsg=null; renderCheat();};
+      $("#cheat-form").onsubmit=saveCheat;
+    }
+    else body.innerHTML=`${cheat&&cheat.text?`<div class="cs">${mdToHtml(cheat.text)}</div>`:""}
+      <figure class="cs-sheet"><img src="cheat/preview.png" alt="Шпаргалка музиканта: квартоквінтове коло, октава фортепіано, тризвуки, інтервали, гриф гітари з басовими струнами і п'ять позицій пентатоніки" width="1654" height="2339" loading="lazy"></figure>`;
+    const ed=$("#cheat-edit"); if(ed) ed.onclick=()=>{cheatEdit=true; renderCheat(); $("#cheat-text")?.focus();};
+  }
+  async function saveCheat(e){
+    e.preventDefault(); cheatMsg={text:"Зберігаю…"};
+    const text=$("#cheat-text").value, urlRaw=$("#cheat-url").value.trim(), file=$("#cheat-pdf")?.files?.[0];
+    const url=urlRaw?safeUrl(urlRaw):""; if(urlRaw&&!url){ cheatMsg={text:"Посилання має починатися з https://",cls:"err"}; return renderCheat(); }
+    try{
+      let pdfId=cheat?.pdfId||"";
+      if(file){ const r=await assets.upload(file,{type:"application/pdf"}); pdfId=r.id; }
+      const body={text,url,pdfId,updated:new Date().toISOString()};
+      await db.doc("library/cheatsheet").set(body); cheat=body; cheatEdit=false; cheatMsg=null;
+    }catch(err){ cheatMsg={text:"Не вдалося зберегти. Спробуй ще раз.",cls:"err"}; }
+    renderCheat();
+  }
+  function openCheat(){ cheatOpener=document.activeElement; $("#cheat-modal").hidden=false; document.body.style.overflow="hidden"; renderCheat(); $("#cheat-close").focus(); }
+  function closeCheat(){ $("#cheat-modal").hidden=true; document.body.style.overflow=""; cheatEdit=false; if(cheatOpener&&cheatOpener.focus) cheatOpener.focus(); }
+  $("#open-cheat").onclick=openCheat; $("#cheat-close").onclick=closeCheat;
+  $("#cheat-modal").addEventListener("click",e=>{ if(e.target.id==="cheat-modal") closeCheat(); });
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("#cheat-modal").hidden) closeCheat(); });
+
+  // ---------- Lyrics, comments, rehearsal ----------
+  let sm={kind:null,id:null,edit:false,msg:null,opener:null,delId:null};
+  const fmtDate=iso=>{try{const d=new Date(iso);return d.toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch(_){return ""}};
+  function openSM(kind,id){ sm={kind,id,edit:false,msg:null,opener:document.activeElement,delId:null}; $("#song-modal").hidden=false; document.body.style.overflow="hidden"; renderSM(); $("#sm-close").focus(); }
+  function closeSM(){ $("#song-modal").hidden=true; document.body.style.overflow=""; const o=sm.opener; sm={kind:null}; if(o&&o.focus&&document.contains(o)) o.focus(); }
+  const openLyrics=id=>openSM("lyrics",id), openComments=id=>openSM("comments",id);
+  $("#sm-close").onclick=closeSM;
+  $("#song-modal").addEventListener("click",e=>{ if(e.target.id==="song-modal") closeSM(); });
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("#song-modal").hidden) closeSM(); });
+  async function resolveNames(ids){
+    if(!userNs||!ids.length) return;
+    try{ const ps=await userNs.profiles(ids); let ch=false; for(const id of ids){ const n=(ps&&ps[id]&&ps[id].name)||""; if(cmtNames[id]!==n){cmtNames[id]=n; ch=true;} } if(ch&&sm.kind==="comments") renderSM(); }catch(_){}
+  }
+  function renderSM(){
+    if(!sm.kind) return;
+    const s=songs.find(x=>x.id===sm.id); if(!s){ closeSM(); return; }
+    $("#sm-title").textContent=s.title||"Без назви"; $("#sm-kicker").textContent=(s.artist||"")+(sm.kind==="lyrics"?" · текст пісні":" · коментарі");
+    const body=$("#sm-body"), tools=$("#sm-tools");
+    if(sm.kind==="lyrics"){
+      const txt=(sm.id===openId&&draft)?draft.lyrics:s.lyrics;
+      tools.innerHTML=`<span style="display:inline-flex;gap:6px;flex-wrap:wrap">${lyricLinks(s)}${canWrite&&db&&!sm.edit?`<button type="button" id="sm-edit">${txt?"Редагувати":"Додати текст"}</button>`:""}</span>`;
+      if(sm.edit){
+        body.innerHTML=`<form id="sm-form" style="display:grid;gap:10px"><label class="f">Текст пісні<textarea id="sm-text" rows="18">${esc(txt||"")}</textarea></label>
+          <span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="submit" class="primary">Зберегти текст</button><button type="button" class="ghost" id="sm-cancel">Скасувати</button><span class="status ${sm.msg?.cls||""}">${esc(sm.msg?.text||"")}</span></span></form>`;
+        $("#sm-cancel").onclick=()=>{sm.edit=false; sm.msg=null; renderSM();};
+        $("#sm-form").onsubmit=async e=>{ e.preventDefault(); const v=$("#sm-text").value;
+          try{ await db.doc("songs/"+sm.id).update({lyrics:v}); s.lyrics=v; if(draft&&openId===sm.id){ draft.lyrics=v; } sm.edit=false; sm.msg=null; if(openId===sm.id&&!dirty) renderCard(); }
+          catch(_){ sm.msg={text:"Не вдалося зберегти текст.",cls:"err"}; }
+          renderSM(); };
+        $("#sm-text").focus();
+      } else body.innerHTML=txt&&txt.trim()?`<p class="lyrics">${esc(txt)}</p>`:`<div class="banner"><h3>Текст ще не додано</h3><p class="muted">Відкрий слова на Genius чи Musixmatch кнопками вгорі.${canWrite&&db?" Щоб мати текст тут, натисни «Додати текст» і встав його.":""}</p></div>`;
+      const ed=$("#sm-edit"); if(ed) ed.onclick=()=>{sm.edit=true; renderSM();};
+      return;
+    }
+    // comments
+    tools.innerHTML="";
+    const list=comments.filter(c=>c.songId===sm.id).sort((a,b)=>String(a.created).localeCompare(String(b.created)));
+    resolveNames([...new Set(list.map(c=>c.author).filter(a=>a&&!(a in cmtNames)))]);
+    const canDel=c=>canWrite&&(c.author&&c.author===me || (userNs&&userNs.canEdit&&userNs.canEdit()));
+    body.innerHTML=`<div class="cmts">${list.length?list.map(c=>`<article class="cmt"><header><b>${esc(c.author===me?"Ти":(cmtNames[c.author]||"Учасник гурту"))}</b><span>${esc(fmtDate(c.created))}</span>
+        ${canDel(c)?(sm.delId===c.id?`<span class="confirm" style="margin-left:auto">Видалити? <button type="button" class="danger" data-cdy="${esc(c.id)}">Так</button><button type="button" class="ghost" data-cdn>Ні</button></span>`:`<button type="button" class="ghost" data-cd="${esc(c.id)}">Видалити</button>`):""}</header>
+        <p>${esc(c.text)}</p></article>`).join(""):`<p class="muted">${commentsLoaded?"Коментарів ще немає.":"Завантажую коментарі…"}</p>`}</div>
+      ${canWrite&&db?`<form class="cmt-form" id="cmt-form"><label class="f">Новий коментар<textarea id="cmt-text" rows="3" placeholder="Що підтягнути, де збиваємось, ідеї для аранжування…"></textarea></label>
+        <span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="submit" class="primary">Додати коментар</button><span class="status ${sm.msg?.cls||""}">${esc(sm.msg?.text||"")}</span></span></form>`:`<p class="note">Коментувати можуть учасники з правом редагування.</p>`}`;
+    body.querySelectorAll("[data-cd]").forEach(b=>b.onclick=()=>{sm.delId=b.dataset.cd; renderSM();});
+    body.querySelectorAll("[data-cdn]").forEach(b=>b.onclick=()=>{sm.delId=null; renderSM();});
+    body.querySelectorAll("[data-cdy]").forEach(b=>b.onclick=async()=>{ const id=b.dataset.cdy; try{ await db.doc("comments/"+id).delete(); comments=comments.filter(c=>c.id!==id); }catch(_){ sm.msg={text:"Не вдалося видалити коментар.",cls:"err"}; } sm.delId=null; renderSM(); refreshAfterComments(); });
+    const f=$("#cmt-form"); if(f) f.onsubmit=async e=>{ e.preventDefault(); const t=$("#cmt-text").value.trim(); if(!t){ sm.msg={text:"Напиши текст коментаря.",cls:"err"}; return renderSM(); }
+      const body={songId:sm.id,text:t,author:me||"",created:new Date().toISOString()};
+      try{ const ref=await db.collection("comments").add(body); if(!comments.some(c=>c.id===ref.id)) comments.push({id:ref.id,...body}); sm.msg=null; }
+      catch(_){ sm.msg={text:"Не вдалося додати коментар. Спробуй ще раз.",cls:"err"}; }
+      renderSM(); refreshAfterComments(); const ta=$("#cmt-text"); if(ta) ta.focus(); };
+    const box=$("#sm-body"); if(list.length&&!sm.delId) box.scrollTop=box.scrollHeight;
+  }
+  function refreshAfterComments(){ if(openId){ const b=document.querySelector('#card-view [data-cmt]'); if(b){ const n=cmtCount(openId); b.innerHTML=`${ICON.cmt}Коментарі${n?` <span class="cnt">${n}</span>`:""}`; } } else renderList(); }
+  async function toggleReh(id){
+    const s=songs.find(x=>x.id===id); if(!s||!db) return;
+    const v=!s.rehearsal; s.rehearsal=v; if(draft&&openId===id) draft.rehearsal=v;
+    try{ await db.doc("songs/"+id).update({rehearsal:v}); }catch(_){ s.rehearsal=!v; if(draft&&openId===id) draft.rehearsal=!v; }
+    if(openId===id){ const b=document.querySelector('#card-view [data-reh]'); if(b){ b.setAttribute("aria-pressed",String(!!s.rehearsal)); b.innerHTML=`${ICON.reh}${s.rehearsal?"На репетиції":"На репетицію"}`; } } else renderList();
+  }
+  $("#reh-clear").onclick=()=>{
+    const n=songs.filter(s=>s.rehearsal).length; if(!n) return;
+    $("#reh-clear-wrap").innerHTML=`<span class="confirm">Зняти ${n} ${plural(n,"пісню","пісні","пісень")} з плану? <button type="button" class="danger" id="reh-yes">Так</button><button type="button" class="ghost" id="reh-no">Ні</button></span>`;
+    $("#reh-no").onclick=restoreRehClear;
+    $("#reh-yes").onclick=async()=>{ for(const s of songs.filter(x=>x.rehearsal)){ try{ await db.doc("songs/"+s.id).update({rehearsal:false}); s.rehearsal=false; }catch(_){} } restoreRehClear(); renderList(); };
+  };
+  const rehClearHandler=$("#reh-clear").onclick;
+  function restoreRehClear(){ $("#reh-clear-wrap").innerHTML=`<button type="button" class="ghost" id="reh-clear">Очистити план репетиції</button>`; $("#reh-clear").onclick=rehClearHandler; }
+
+  // ---------- data backup / import ----------
+  const COLLS=["songs","presets","lessons","comments","library"];
+  $("#data-export").onclick=async()=>{
+    const st=$("#data-status"); if(!db){ st.textContent="Спершу увійди на сайт."; return; }
+    st.className="status"; st.textContent="Збираю дані…";
+    try{
+      const out={format:"setlist-export-1",exported:new Date().toISOString()};
+      for(const c of COLLS){ const rows=await window.bandBackend.rpc("api_list",{p_collection:c}); out[c]=Object.fromEntries((rows||[]).map(r=>[r.id,r.data])); }
+      const blob=new Blob([JSON.stringify(out,null,1)],{type:"application/json"});
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`setlist-${todayStr()}.json`; document.body.appendChild(a); a.click(); a.remove();
+      st.className="status ok"; st.textContent="Файл збережено. PDF лишаються в сховищі сайту, у файлі — лише посилання на них.";
+    }catch(e){ st.className="status err"; st.textContent="Не вдалося зібрати дані. Спробуй ще раз."; }
+  };
+  $("#data-import").onchange=async e=>{
+    const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
+    const st=$("#data-status"); st.className="status"; st.textContent="Читаю файл…";
+    if(!db||!assets){ st.className="status err"; st.textContent="Спершу увійди на сайт."; return; }
+    try{
+      const data=JSON.parse(await f.text()); if(!data||data.format!=="setlist-export-1") throw new Error("format");
+      const files=data.files||{}, map={};
+      for(const [key,fi] of Object.entries(files)){
+        st.textContent=`Завантажую файл ${fi.name}…`;
+        const bin=Uint8Array.from(atob(fi.base64),c=>c.charCodeAt(0));
+        const r=await assets.upload(new File([bin],fi.name,{type:fi.type||"application/pdf"}),{type:fi.type||"application/pdf"}); map[key]=r.id;
+      }
+      let n=0;
+      for(const c of COLLS){
+        for(const [id,doc] of Object.entries(data[c]||{})){
+          if(Array.isArray(doc.pdfs)) doc.pdfs=doc.pdfs.map(p=>map[p.id]?{...p,id:map[p.id]}:p);
+          if(doc.pdfId&&map[doc.pdfId]) doc.pdfId=map[doc.pdfId];
+          await db.doc(c+"/"+id).set(doc); n++; st.textContent=`Записано ${n}…`;
+        }
+      }
+      st.className="status ok"; st.textContent=`Готово: завантажено ${n} ${plural(n,"запис","записи","записів")}.`;
+      window.bandBackend.reload();
+    }catch(err){ st.className="status err"; st.textContent=err&&err.message==="format"?"Це не файл даних сетлиста.":"Не вдалося завантажити дані. Перевір файл і спробуй ще раз."; }
+  };
+  const setWho=()=>{ const n=window.bandBackend&&window.bandBackend.me(); $("#who-name").textContent=n||"—"; };
+  setInterval(setWho,1500); setWho();
+
+  // boot
+  renderList(); renderLearn(); renderPresets();
+  (async()=>{
+    if(!window.claude||!claude.use){ $("#count").textContent="Список пісень відкривається на claude.ai."; $("#learn-status").textContent="Матеріали відкриваються на claude.ai."; return; }
+    db=await claude.use("db");
+    if(!db){ $("#count").textContent="Список пісень недоступний у цьому перегляді. Увійди в акаунт, щоб бачити сетлист."; $("#learn-status").textContent="Матеріали недоступні в цьому перегляді."; $("#add-song").hidden=true; return; }
+    const user=await claude.use("user"); userNs=user;
+    if(user){ try{ const c=await user.can("data.write"); if(c===false) canWrite=false; }catch(_){} try{ me=await user.id(); }catch(_){} }
+    db.collection("comments").onSnapshot(snap=>{
+      comments=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))})); commentsLoaded=true;
+      if(sm.kind==="comments") renderSM(); refreshAfterComments();
+    },()=>{ commentsLoaded=true; });
+    if(!canWrite) $("#add-song").hidden=true;
+    claude.use("assets").then(a=>{ assets=a; if(openId&&!dirty) renderCard(); renderLearn(); });
+    renderLearn();
+    db.doc("library/cheatsheet").onSnapshot(snap=>{
+      cheat=snap.exists?JSON.parse(JSON.stringify(snap.data())):null; cheatLoaded=true;
+      if(!$("#cheat-modal").hidden&&!cheatEdit) renderCheat();
+    },()=>{ cheatLoaded=true; });
+    db.collection("presets").onSnapshot(snap=>{
+      presets=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))}));
+      presetsLoaded=true;
+      if(!editingPreset) renderPresets(); fillPresetFilter();
+      if(openId){ if(!dirty) renderCard(); } else renderList();
+    },()=>{ presetsLoaded=true; $("#preset-list").innerHTML=`<p class="muted">Пресети зараз недоступні.</p>`; });
+    db.collection("lessons").onSnapshot(snap=>{
+      lessons=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))}));
+      lessonsLoaded=true; renderLearn();
+    },()=>{ lessonsLoaded=true; $("#learn-status").hidden=false; $("#learn-status").textContent="Матеріали зараз недоступні."; });
+    let timer=setTimeout(()=>{ if(!loaded) $("#count").textContent="Не вдається дістатися до списку. Перевір з'єднання."; },10000);
+    db.collection("songs").onSnapshot(snap=>{
+      if(!snap.metadata.fromCache){ clearTimeout(timer); }
+      songs=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))}));
+      loaded=true;
+      if(!editingPreset&&!delPreset) renderPresets();
+      if(sm.kind==="lyrics"&&!sm.edit) renderSM();
+      if(openId){ if(!songs.find(s=>s.id===openId)) closeCard(); }
+      else renderList();
+    },err=>{ clearTimeout(timer); loaded=true; $("#count").textContent="Список пісень зараз недоступний."; });
+  })();
+})();
+</script>
+</body>
+</html>

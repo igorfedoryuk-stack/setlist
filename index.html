@@ -318,6 +318,29 @@ button.big{font-size:1rem;padding:12px 18px}
 .dest{display:flex;gap:8px;flex-wrap:wrap}
 .dest button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .add-way{display:grid;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.card-sticky{position:sticky;top:0;z-index:4;background:var(--bg);margin:0 calc(-1*var(--gut,0px));padding:12px 0 10px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.cs-titles{display:grid;gap:2px}
+.card-sticky input.cs-title{font:700 1.8rem/1.1 var(--f-display);letter-spacing:.01em;border:1px solid transparent;background:transparent;padding:2px 6px;margin-left:-7px;width:100%}
+.card-sticky input.cs-artist{font:600 1rem/1.2 var(--f-body);color:var(--muted);border:1px solid transparent;background:transparent;padding:2px 6px;margin-left:-7px;width:100%}
+.card-sticky input:hover:not(:disabled),.card-sticky input:focus{border-color:var(--line);background:var(--surface)}
+.cs-acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cs-pos{margin-left:auto;font-size:.82rem}
+body.card-open header.top{position:relative;top:auto}
+.perf{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.perf>div,.perf>section{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 14px;display:grid;gap:10px;align-content:start;margin:0}
+.perf .block-head{margin:0;padding:0 0 6px}
+.perf .practice{border:0;padding:0;background:none}
+.perf-me{border-color:var(--accent)!important}
+@media (max-width:720px){.perf{grid-template-columns:1fr}.card-sticky input.cs-title{font-size:1.35rem}}
+details.grp{margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+details.grp>summary{list-style:none;cursor:pointer;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary::before{content:"▸";color:var(--accent);font-size:.9rem;transition:transform .15s}
+details.grp[open]>summary::before{transform:rotate(90deg)}
+details.grp .gt{font:600 1.05rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em}
+details.grp .gs{color:var(--muted);font-size:.85rem;min-width:0}
+details.grp>.gb{padding:0 14px 14px;display:grid;gap:12px}
+details.grp>.gb .grid{margin-top:0}
 .add-way h3{margin:0;font:600 .8rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
 /* settings tiles */
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:18px}
@@ -1152,11 +1175,13 @@ button.big{font-size:1rem;padding:12px 18px}
     const s=songs.find(x=>x.id===id); if(!s) return;
     openId=id; dirty=false;
     draft=JSON.parse(JSON.stringify({sections:[],pdfs:[],...s}));
-    $("#list-view").hidden=true; $("#card-view").hidden=false;
+    $("#list-view").hidden=true; $("#card-view").hidden=false; document.body.classList.add("card-open");
     renderCard(); scrollTo(0,0);
   }
-  function closeCard(){ openId=null; draft=null; $("#card-view").hidden=true; $("#list-view").hidden=false; renderList(); }
+  function closeCard(){ openId=null; draft=null; document.body.classList.remove("card-open"); $("#card-view").hidden=true; $("#list-view").hidden=false; renderList(); }
 
+  let GRP={main:true,struct:true}; try{ GRP={...GRP,...JSON.parse(localStorage.getItem("cardGroups")||"{}")}; }catch(_){}
+  const grpOpen=id=>!!GRP[id];
   function renderCard(msg,cls){
     const d=draft, all=sorted(), pos=all.findIndex(s=>s.id===openId)+1, ro=!canWrite;
     const opt=(v,l,cur)=>`<option value="${esc(v)}" ${String(cur)===String(v)?"selected":""}>${esc(l)}</option>`;
@@ -1175,62 +1200,37 @@ button.big{font-size:1rem;padding:12px 18px}
     const pdfs=(d.pdfs||[]).map((f,i)=>`
       <div class="pdf"><a href="${esc(blobUrl(f.id))}" target="_blank" rel="noopener">${esc(f.name||"Ноти.pdf")}</a>
       ${assets?`<span data-pdfwrap="${i}"><button type="button" class="ghost" data-pdfdel="${i}">Видалити</button></span>`:""}</div>`).join("");
+    const sumMain=[d.tuning||"E",Number(d.keyShift)?("тон. "+(d.keyShift>0?"+":"")+d.keyShift):"",d.bpm?d.bpm+" BPM":"",d.preset||"",vocsOf(d).join(", "),STATUS_NAME[statusOf(d)]].filter(Boolean).map(esc).join(" · ");
+    const nSec=(d.sections||[]).length, nPdf=(d.pdfs||[]).length;
     $("#card-view").innerHTML=`
-      <div class="card-head">
-        <span style="display:flex;gap:6px;flex-wrap:wrap">
+      <div class="card-sticky">
+        <div class="cs-titles">
+          <input id="c-title" class="cs-title" value="${esc(d.title)}" aria-label="Назва" placeholder="Назва" ${ro?"disabled":""}>
+          <input id="c-artist" class="cs-artist" value="${esc(d.artist)}" aria-label="Виконавець" placeholder="Виконавець" ${ro?"disabled":""}>
+        </div>
+        <div class="cs-acts">
           <button type="button" class="ib" data-lyr="${esc(openId)}">${ICON.text}Текст</button>
           <button type="button" class="ib" data-cmt="${esc(openId)}">${ICON.cmt}Коментарі${cmtCount(openId)?` <span class="cnt">${cmtCount(openId)}</span>`:""}</button>
           ${ro?"":`<button type="button" class="ib reh" data-reh="${esc(openId)}" aria-pressed="${!!d.rehearsal}">${ICON.reh}${d.rehearsal?"На репетиції":"На репетицію"}</button>`}
-        </span>
-        <span class="muted">№ ${pos} з ${all.length}</span>
-      </div>
-      <div class="grid">
-        <label class="f w2">Назва<input id="c-title" value="${esc(d.title)}" ${ro?"disabled":""}></label>
-        <label class="f w2">Виконавець<input id="c-artist" value="${esc(d.artist)}" ${ro?"disabled":""}></label>
-        <label class="f">Список<select id="c-status" ${ro?"disabled":""}>${Object.entries(STATUS_NAME).map(([v,l])=>opt(v,l,statusOf(d))).join("")}</select></label>
-        <label class="f">Загальний номер<input id="c-pos" type="number" min="1" max="${all.length}" value="${pos}" ${ro?"disabled":""}></label>
-        <label class="f">Стрій<select id="c-tuning" ${ro?"disabled":""}>${tunOpts}</select></label>
-        <label class="f">Тональність<select id="c-key" ${ro?"disabled":""}>${keyOpts}</select></label>
-        <label class="f">BPM<input id="c-bpm" inputmode="numeric" value="${esc(d.bpm)}" placeholder="120" ${ro?"disabled":""}></label>
-        <label class="f w2">Пресет ME-90<select id="c-preset" ${ro?"disabled":""}>${presetOpts}</select></label>
-        <div class="f w4">Вокаліст<span class="vocs" role="group" aria-label="Вокаліст">${VOCALISTS.map(v=>`<button type="button" class="sbtn" data-voc="${esc(v)}" aria-pressed="${vocsOf(d).includes(v)}" ${ro?"disabled":""}>${esc(v)}</button>`).join("")}</span></div>
-        <label class="f w2">CTL<input id="c-ctl" value="${esc(d.ctl)}" placeholder="Соло / драйв на приспів" ${ro?"disabled":""}></label>
-        <label class="f w4">Як грати<textarea id="c-notes" rows="2" ${ro?"disabled":""}>${esc(d.notes)}</textarea></label>
-        <label class="f w4">Текст пісні<textarea id="c-lyrics" rows="8" placeholder="Встав текст пісні. Порожні рядки розділяють куплети." ${ro?"disabled":""}>${esc(d.lyrics)}</textarea></label>
-      </div>
-      ${d.bpm&&Number(d.bpm)>0?`<p class="note">Делей у темп: четвертна ${Math.round(60000/Number(d.bpm))} мс, пунктирна восьма ${Math.round(45000/Number(d.bpm))} мс.</p>`:""}
-      <section class="block">
-        <div class="block-head"><h3>Розбір і пісня</h3></div>
-        <div class="media">
-          <label class="f">Відеорозбір (YouTube)<input id="c-lesson" type="url" value="${esc(d.lessonUrl)}" placeholder="https://www.youtube.com/watch?v=…" ${ro?"disabled":""}></label>
-          <span class="acts">${safeUrl(d.lessonUrl)?`<a class="btn" href="${esc(safeUrl(d.lessonUrl))}" target="_blank" rel="noopener">▶ Відкрити розбір</a>`:""}</span>
-          <label class="f">Пісня для тренування (YouTube, Apple Music, Spotify)<input id="c-song" type="url" value="${esc(d.songUrl)}" placeholder="https://…" ${ro?"disabled":""}></label>
-          <span class="acts"><a class="btn" href="${esc(safeUrl(d.songUrl)||ytUrl(d))}" target="_blank" rel="noopener">♪ Пісня</a><a class="btn" href="${esc(appleUrl(d))}" target="_blank" rel="noopener">Apple Music</a></span>
-          <label class="f">Текст пісні (посилання)<input id="c-lyrurl" type="url" value="${esc(d.lyricsUrl)}" placeholder="https://genius.com/…" ${ro?"disabled":""}></label>
-          <span class="acts">${lyricLinks(d)}</span>
-          <label class="f">Акорди / таби (Ultimate Guitar)<input id="c-ug" type="url" value="${esc(d.ugUrl)}" placeholder="https://tabs.ultimate-guitar.com/…" ${ro?"disabled":""}></label>
-          <span class="acts"><a class="btn" href="${esc(safeUrl(d.ugUrl)||ugSearch(d))}" target="_blank" rel="noopener">♯ Ultimate Guitar</a></span>
+          <span class="muted cs-pos">№ ${pos} з ${all.length}</span>
         </div>
-        <p class="note">Посилання відкриваються в новій вкладці або в застосунку, тож пісня грає паралельно зі сторінкою. Встав посилання на конкретне відео, щоб замінити пошук. Після зміни натисни «Зберегти».</p>
-      </section>
-      <section class="block">
-        <div class="block-head"><h3>Готовність гурту</h3><span class="muted">${rateOf(d)?`${rateOf(d)} з 5 — ${RATE_LABEL[rateOf(d)]}`:"Ще без оцінки"}</span></div>
+      </div>
+      <section class="perf">
+        <div class="perf-band">
+          <div class="block-head"><h3>Гурт</h3><span class="muted">${rateOf(d)?`${rateOf(d)} з 5 — ${RATE_LABEL[rateOf(d)]}`:"готовність без оцінки"}</span></div>
         <div class="rate" role="group" aria-label="Готовність від 1 до 5">
           ${[1,2,3,4,5].map(v=>`<button type="button" class="v${v}" data-rate="${v}" aria-pressed="${rateOf(d)===v}" title="${RATE_LABEL[v]}" ${ro?"disabled":""}>${v}</button>`).join("")}
           ${!ro&&rateOf(d)?`<button type="button" class="ghost" data-rate="0">Скинути</button>`:""}
         </div>
-      </section>
-      <section class="block">
-        <div class="block-head"><h3>Репетиції гурту</h3></div>
         <div class="practice">
           <span><span class="big">${logOf(d).length}</span> <span class="muted">${plural(logOf(d).length,"репетиція","репетиції","репетицій")}</span></span>
           <span>Остання: <b>${lastOf(d)?lastOf(d).split("-").reverse().join(".")+" · "+agoText(d):"ще не було"}</b></span>
           ${ro?"":`<label><input type="checkbox" id="c-prac" ${logOf(d).includes(todayStr())?"checked":""}>Грали на репетиції сьогодні</label>`}
         </div>
-      </section>
+        </div>
       ${uKey()?(()=>{ const mr=myRate(openId), ml=myLog(openId), mo={practiceLog:ml}, inM=inMine(songs.find(x=>x.id===openId)||d);
-        return `<section class="block">
-        <div class="block-head"><h3>Моє тренування</h3><span class="muted">${inM?"У твоєму списку":"Не в твоєму списку"} · бачиш лише ти</span></div>
+        return `<section class="block perf-me">
+        <div class="block-head"><h3>Моє</h3><span class="muted">${inM?"у твоєму списку":"не в твоєму списку"} · бачиш лише ти</span></div>
         <div class="rate" role="group" aria-label="Моя готовність від 1 до 5">
           ${[1,2,3,4,5].map(v=>`<button type="button" class="v${v}" data-myrate="${v}" aria-pressed="${mr===v}" title="${RATE_LABEL[v]}" ${ro?"disabled":""}>${v}</button>`).join("")}
           ${!ro&&mr?`<button type="button" class="ghost" data-myrate="0">Скинути</button>`:""}
@@ -1243,24 +1243,70 @@ button.big{font-size:1rem;padding:12px 18px}
           ${ro||statusOf(d)==="solo"?"":`<button type="button" id="c-mine">${inM?"Прибрати з мого списку":"Додати в моє тренування"}</button>`}
         </div>
       </section>`; })():""}
-      <section class="block">
-        <div class="block-head"><h3>Голосування</h3>${tallyHtml(openId)||`<span class="muted">Ще ніхто не голосував</span>`}</div>
+      </section>
+      <details class="grp" data-grp="main" ${grpOpen("main")?"open":""}>
+        <summary><span class="gt">Основне</span><span class="gs">${sumMain}</span></summary>
+        <div class="gb">
+      <div class="grid">
+        <label class="f">Список<select id="c-status" ${ro?"disabled":""}>${Object.entries(STATUS_NAME).map(([v,l])=>opt(v,l,statusOf(d))).join("")}</select></label>
+        <label class="f">Загальний номер<input id="c-pos" type="number" min="1" max="${all.length}" value="${pos}" ${ro?"disabled":""}></label>
+        <label class="f">Стрій<select id="c-tuning" ${ro?"disabled":""}>${tunOpts}</select></label>
+        <label class="f">Тональність<select id="c-key" ${ro?"disabled":""}>${keyOpts}</select></label>
+        <label class="f">BPM<input id="c-bpm" inputmode="numeric" value="${esc(d.bpm)}" placeholder="120" ${ro?"disabled":""}></label>
+        <label class="f w2">Пресет ME-90<select id="c-preset" ${ro?"disabled":""}>${presetOpts}</select></label>
+        <div class="f w4">Вокаліст<span class="vocs" role="group" aria-label="Вокаліст">${VOCALISTS.map(v=>`<button type="button" class="sbtn" data-voc="${esc(v)}" aria-pressed="${vocsOf(d).includes(v)}" ${ro?"disabled":""}>${esc(v)}</button>`).join("")}</span></div>
+        <label class="f w2">CTL<input id="c-ctl" value="${esc(d.ctl)}" placeholder="Соло / драйв на приспів" ${ro?"disabled":""}></label>
+        <label class="f w4">Як грати<textarea id="c-notes" rows="2" ${ro?"disabled":""}>${esc(d.notes)}</textarea></label>
+      </div>
+      ${d.bpm&&Number(d.bpm)>0?`<p class="note">Делей у темп: четвертна ${Math.round(60000/Number(d.bpm))} мс, пунктирна восьма ${Math.round(45000/Number(d.bpm))} мс.</p>`:""}
+        </div>
+      </details>
+      <details class="grp" data-grp="struct" ${grpOpen("struct")?"open":""}>
+        <summary><span class="gt">Структура й акорди</span><span class="gs">${nSec?nSec+" "+plural(nSec,"частина","частини","частин"):"порожньо"}</span></summary>
+        <div class="gb">
+          ${ro?"":`<span style="display:flex;gap:6px;flex-wrap:wrap">${d.sections.length?"":`<button type="button" id="tpl">Типова структура</button>`}<button type="button" id="add-sec">+ Частина</button></span>`}
+        ${sec||`<p class="muted">Ще немає частин. Додай типову структуру (інтро, куплет, приспів, соло…) або частини по одній.</p>`}
+        </div>
+      </details>
+      <details class="grp" data-grp="lyrics" ${grpOpen("lyrics")?"open":""}>
+        <summary><span class="gt">Текст пісні</span><span class="gs">${String(d.lyrics||"").trim()?"є текст":"порожньо"}</span></summary>
+        <div class="gb">
+      <div class="grid">
+        <label class="f w4">Текст пісні<textarea id="c-lyrics" rows="8" placeholder="Встав текст пісні. Порожні рядки розділяють куплети." ${ro?"disabled":""}>${esc(d.lyrics)}</textarea></label>
+      </div>
+        </div>
+      </details>
+      <details class="grp" data-grp="media" ${grpOpen("media")?"open":""}>
+        <summary><span class="gt">Розбір і посилання</span><span class="gs">${[safeUrl(d.lessonUrl)?"розбір":"",safeUrl(d.songUrl)?"пісня":"",safeUrl(d.ugUrl)?"UG":""].filter(Boolean).join(" · ")||"пошук за назвою"}</span></summary>
+        <div class="gb">
+        <div class="media">
+          <label class="f">Відеорозбір (YouTube)<input id="c-lesson" type="url" value="${esc(d.lessonUrl)}" placeholder="https://www.youtube.com/watch?v=…" ${ro?"disabled":""}></label>
+          <span class="acts">${safeUrl(d.lessonUrl)?`<a class="btn" href="${esc(safeUrl(d.lessonUrl))}" target="_blank" rel="noopener">▶ Відкрити розбір</a>`:""}</span>
+          <label class="f">Пісня для тренування (YouTube, Apple Music, Spotify)<input id="c-song" type="url" value="${esc(d.songUrl)}" placeholder="https://…" ${ro?"disabled":""}></label>
+          <span class="acts"><a class="btn" href="${esc(safeUrl(d.songUrl)||ytUrl(d))}" target="_blank" rel="noopener">♪ Пісня</a><a class="btn" href="${esc(appleUrl(d))}" target="_blank" rel="noopener">Apple Music</a></span>
+          <label class="f">Текст пісні (посилання)<input id="c-lyrurl" type="url" value="${esc(d.lyricsUrl)}" placeholder="https://genius.com/…" ${ro?"disabled":""}></label>
+          <span class="acts">${lyricLinks(d)}</span>
+          <label class="f">Акорди / таби (Ultimate Guitar)<input id="c-ug" type="url" value="${esc(d.ugUrl)}" placeholder="https://tabs.ultimate-guitar.com/…" ${ro?"disabled":""}></label>
+          <span class="acts"><a class="btn" href="${esc(safeUrl(d.ugUrl)||ugSearch(d))}" target="_blank" rel="noopener">♯ Ultimate Guitar</a></span>
+        </div>
+        <p class="note">Посилання відкриваються в новій вкладці або в застосунку, тож пісня грає паралельно зі сторінкою. Встав посилання на конкретне відео, щоб замінити пошук. Після зміни натисни «Зберегти».</p>
+        </div>
+      </details>
+      <details class="grp" data-grp="pdf" ${grpOpen("pdf")?"open":""}>
+        <summary><span class="gt">Ноти (PDF)</span><span class="gs">${nPdf?nPdf+" "+plural(nPdf,"файл","файли","файлів"):"немає"}</span></summary>
+        <div class="gb">
+        <div class="block-head" style="border:0">${assets?`<label class="btn" for="pdf-in">Прикріпити PDF</label><input id="pdf-in" type="file" accept="application/pdf" hidden>`:""}</div>
+        <div class="pdfs">${pdfs||`<p class="muted">Нот ще немає.${assets?" Прикріпи PDF — він відкриється тут для всіх, хто бачить сторінку.":" Прикріпляти PDF може власник або редактор сторінки."}</p>`}</div>
+        </div>
+      </details>
+      <details class="grp" data-grp="vote" ${grpOpen("vote")?"open":""}>
+        <summary><span class="gt">Голосування</span><span class="gs">${tallyHtml(openId)||"ще ніхто не голосував"}</span></summary>
+        <div class="gb">
         ${ro?"":`<span class="vote-box">${voteBtns(openId)}</span>`}
         ${votesFor(openId).length?`<p class="muted" style="margin:0">${esc(votesFor(openId).map(x=>`${x.name}: ${VOTE_NAME[x.v]}`).join(" · "))}</p>`:""}
         ${statusOf(d)==="solo"&&!ro?`<span><button type="button" data-st-card="vote">Винести на голосування гурту</button></span>`:""}
-      </section>
-      <section class="block">
-        <div class="block-head"><h3>Структура й акорди</h3>
-          ${ro?"":`<span style="display:flex;gap:6px;flex-wrap:wrap">${d.sections.length?"":`<button type="button" id="tpl">Типова структура</button>`}<button type="button" id="add-sec">+ Частина</button></span>`}
         </div>
-        ${sec||`<p class="muted">Ще немає частин. Додай типову структуру (інтро, куплет, приспів, соло…) або частини по одній.</p>`}
-      </section>
-      <section class="block">
-        <div class="block-head"><h3>Ноти (PDF)</h3>
-          ${assets?`<label class="btn" for="pdf-in">Прикріпити PDF</label><input id="pdf-in" type="file" accept="application/pdf" hidden>`:""}
-        </div>
-        <div class="pdfs">${pdfs||`<p class="muted">Нот ще немає.${assets?" Прикріпи PDF — він відкриється тут для всіх, хто бачить сторінку.":" Прикріпляти PDF може власник або редактор сторінки."}</p>`}</div>
-      </section>
+      </details>
       <div class="savebar">
         <button type="button" class="back" id="back">← Сетлист</button>
         ${ro?"":`<button type="button" class="primary" id="save">Зберегти</button>
@@ -1274,6 +1320,7 @@ button.big{font-size:1rem;padding:12px 18px}
   function setDirty(){ dirty=true; const st=$("#status"); if(st){st.textContent="Є незбережені зміни"; st.className="status";} }
   function bindCard(){
     $("#back").onclick=closeCard;
+    document.querySelectorAll("#card-view details.grp").forEach(g=>g.addEventListener("toggle",()=>{ GRP[g.dataset.grp]=g.open; try{localStorage.setItem("cardGroups",JSON.stringify(GRP))}catch(_){} }));
     document.querySelectorAll("#card-view [data-lyr]").forEach(b=>b.onclick=()=>openLyrics(openId));
     document.querySelectorAll("#card-view [data-cmt]").forEach(b=>b.onclick=()=>openComments(openId));
     document.querySelectorAll("#card-view [data-reh]").forEach(b=>b.onclick=()=>toggleReh(openId));

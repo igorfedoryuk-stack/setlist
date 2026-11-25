@@ -893,7 +893,7 @@ button.big{font-size:1rem;padding:12px 18px}
   const rateOf=s=>{const r=Number(s.rating||0); return r>=1&&r<=5?r:0};
   const starsHtml=r=>r?`<span class="stars" aria-label="Готовність ${r} з 5"><b>${"★".repeat(r)}</b><span>${"★".repeat(5-r)}</span></span>`:`<span class="stars muted">без оцінки</span>`;
   const VOCALISTS=["Саша","Олексій","Алінка","Іванка"];
-  const BAND=[{email:"alina.cheremys@gmail.com",name:"Алінка",role:"Вокал"},{email:"igor.fedoryuk@gmail.com",name:"Ігор",role:"Соло електрогітара"},{email:"nogacrab@gmail.com",name:"Аня",role:"Клавіші"}];
+  const BAND=[{email:"alina.cheremys@gmail.com",name:"Алінка",role:"Вокал"},{email:"igor.fedoryuk@gmail.com",name:"Ігор",role:"Соло електрогітара"},{email:"nogacrab@gmail.com",name:"Аня",role:"Клавіші"},{email:"5739422@gmail.com",name:"Емілія",role:"Бас-гітара"}];
   const roleByEmail=e=>{const m=BAND.find(b=>b.email===String(e||"").toLowerCase()); return m?m.role:"";};
   const roleByName=n=>{const m=BAND.find(b=>b.name===n); return m?m.role:"";};
   let myEmail=null, bandProf={}, cmtEmails={};

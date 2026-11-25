@@ -287,6 +287,37 @@ button.big{font-size:1rem;padding:12px 18px}
 .cs textarea{min-height:40vh;font-family:var(--f-mono);font-size:.88rem}
 .cs-sheet{margin:0;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .cs-sheet img{display:block;width:100%;height:auto}
+/* song lists */
+.lists{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 0;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.lists button{display:inline-flex;align-items:center;gap:6px;font:600 .95rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;padding:8px 12px;border-radius:999px}
+.lists button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.lists .n{font:600 .72rem/1 var(--f-mono);opacity:.75}
+.list-about{margin:8px 0 0;color:var(--muted);font-size:.88rem}
+.gig-head{margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;background:var(--surface);display:grid;gap:8px}
+.gig-head h2{margin:0;font:600 1.3rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.gig-head form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;align-items:end}
+.gig-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ib.tg[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.vote-box{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vote-who{font-size:.8rem;color:var(--muted)}
+/* settings tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:18px}
+.tile{display:grid;gap:8px;align-content:start;text-align:left;padding:16px;min-height:128px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;cursor:pointer;text-transform:none;letter-spacing:0}
+.tile:hover{border-color:var(--fg)}
+.tile .ico{width:38px;height:38px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:700 1.1rem/1 var(--f-display)}
+.tile b{font:600 1.15rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.tile span.d{font-size:.84rem;color:var(--muted);line-height:1.4}
+.tile.add{border-style:dashed;color:var(--muted);place-content:center;justify-items:center;text-align:center}
+.sec-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.sec-bar h2{margin:0;flex:1;font:600 1.6rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.sec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.sec-card{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 14px;display:grid;gap:8px;align-content:start}
+.sec-card h3{margin:0;font:600 .8rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.sec-card .txt{white-space:pre-wrap;margin:0}
+.sec-card .kv{border-left:0;padding:0;background:none}
+.sec-form{display:grid;gap:10px;margin-top:14px}
+.sec-form textarea{min-height:110px}
+.sugg{display:flex;gap:6px;flex-wrap:wrap}
 #band-gate{position:fixed;inset:0;z-index:80;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));overflow:auto}
 .gate-box{width:min(420px,100%);display:grid;gap:14px}
 .gate-box form{display:grid;gap:10px}
@@ -332,14 +363,15 @@ button.big{font-size:1rem;padding:12px 18px}
     </div>
     <nav class="tabs" aria-label="Розділи">
       <a href="#songs" id="tab-songs">Пісні</a>
-      <a href="#learn" id="tab-learn">Навчання</a>
-      <a href="#trainer" id="tab-trainer">Тренажер</a>
       <a href="#setup" id="tab-setup">Налаштування</a>
     </nav>
   </header>
 
   <main id="view-songs">
     <div id="list-view">
+      <div class="lists" id="lists" role="group" aria-label="Списки пісень"></div>
+      <p class="list-about" id="list-about"></p>
+      <div class="gig-head" id="gig-head" hidden></div>
       <div class="listbar">
         <button type="button" id="toggle-filters" aria-expanded="false" aria-controls="filters">Фільтри і сортування <span class="badge" id="fcount" hidden></span></button>
         <span class="grow"></span>
@@ -377,7 +409,7 @@ button.big{font-size:1rem;padding:12px 18px}
       <ol class="set" id="songs"></ol>
       <div class="banner" id="empty" hidden>
         <h3>Сетлист порожній</h3>
-        <p class="muted">Якщо переносиш дані зі старої сторінки, відкрий «Налаштування → Дані сайту» і завантаж файл. Або додай першу пісню кнопкою «+ Пісня». Для кожної можна вказати стрій, BPM, пресет ME-90, структуру з акордами і прикріпити ноти в PDF.</p>
+        <p class="muted">Додай першу пісню кнопкою «+ Пісня». Для кожної можна вказати стрій, BPM, пресет ME-90, структуру з акордами і прикріпити ноти в PDF.</p>
       </div>
     </div>
 
@@ -530,13 +562,29 @@ button.big{font-size:1rem;padding:12px 18px}
   </div>
 
   <main id="view-setup" hidden>
+   <div id="setup-home">
+    <div class="tiles" id="tiles"></div>
+   </div>
+   <div id="setup-sec" hidden>
+    <div class="sec-bar"><button type="button" id="sec-back">← Усі розділи</button><h2 id="sec-title"></h2><span id="sec-tools"></span></div>
+    <div id="sec-body"></div>
+    <div class="sec-static" id="sec-static-data" hidden><article class="ref" id="s-data">
+      <h2>Резервна копія</h2>
+      <p>Тут можна зберегти резервну копію всіх пісень, пресетів, розділів налаштувань і коментарів у файл або завантажити дані з такого файлу.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button type="button" id="data-export">Зберегти резервну копію</button>
+        <label class="btn" for="data-import">Завантажити дані з файлу</label><input id="data-import" type="file" accept="application/json,.json" hidden>
+      </div>
+      <p class="status" id="data-status"></p>
+      <p class="note">Завантаження з файлу додає записи з файлу і перезаписує ті, що мають такий самий ідентифікатор. Решта даних не змінюється.</p>
+    </article></div>
+    <div class="sec-static" id="sec-static-guitar" hidden>
     <div class="chips" id="setup-index">
       <button type="button" data-jump="s-home">Вдома</button>
       <button type="button" data-jump="s-studio">Репетиція і клуб</button>
       <button type="button" data-jump="s-4cm">4 кабелі</button>
       <button type="button" data-jump="s-presets">Пресети</button>
       <button type="button" data-jump="s-ctl">CTL і збереження</button>
-      <button type="button" data-jump="s-data">Дані сайту</button>
     </div>
 
     <article class="ref" id="s-home">
@@ -631,17 +679,6 @@ button.big{font-size:1rem;padding:12px 18px}
       <div id="preset-add"></div>
     </article>
 
-    <article class="ref" id="s-data">
-      <h2>Дані сайту</h2>
-      <p>Тут можна зберегти резервну копію всіх пісень, пресетів, матеріалів і коментарів у файл або завантажити дані з такого файлу.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <button type="button" id="data-export">Зберегти резервну копію</button>
-        <label class="btn" for="data-import">Завантажити дані з файлу</label><input id="data-import" type="file" accept="application/json,.json" hidden>
-      </div>
-      <p class="status" id="data-status"></p>
-      <p class="note">Завантаження з файлу додає записи з файлу і перезаписує ті, що мають такий самий ідентифікатор. Решта даних не змінюється.</p>
-    </article>
-
     <article class="ref" id="s-ctl">
       <h2>CTL і збереження</h2>
       <ol>
@@ -654,6 +691,8 @@ button.big{font-size:1rem;padding:12px 18px}
       </ol>
       <p class="note">CTL вмикає й вимикає блоки, але не змінює тип ефекту. Замість педалі ефекту можна повернути одну ручку — тоді CTL перемикає її значення.</p>
     </article>
+    </div>
+   </div>
   </main>
 </div>
 
@@ -736,8 +775,10 @@ button.big{font-size:1rem;padding:12px 18px}
 
   // routing
   function route(){
-    let h=(location.hash||"#songs").slice(1); if(!["songs","learn","trainer","setup"].includes(h)) h="songs";
-    for(const v of ["songs","learn","trainer","setup"]){ $("#view-"+v).hidden=v!==h; $("#tab-"+v).setAttribute("aria-current",v===h?"page":"false"); }
+    let full=(location.hash||"#songs").slice(1), h=full.split("/")[0]; if(!["songs","setup"].includes(h)) h="songs";
+    $("#view-learn").hidden=true; $("#view-trainer").hidden=true;
+    for(const v of ["songs","setup"]){ $("#view-"+v).hidden=v!==h; $("#tab-"+v).setAttribute("aria-current",v===h?"page":"false"); }
+    if(h==="setup"&&window.__setupRoute) window.__setupRoute(full.split("/")[1]||"");
   }
   addEventListener("hashchange",route); route();
 
@@ -746,6 +787,25 @@ button.big{font-size:1rem;padding:12px 18px}
   const tuningOf=s=>s.tuning||"E";
   const keyOf=s=>Number(s.keyShift||0);
   const sorted=()=>songs.slice().sort((a,b)=>(a.order??1e9)-(b.order??1e9)||String(a.title).localeCompare(String(b.title)));
+  const LISTS=[
+    {id:"current",name:"Граємо",about:"Пісні, які гурт зараз грає. З них збираємо найближчий виступ кнопкою «У виступ».",empty:"Тут поки порожньо. Якщо переносиш дані зі старої сторінки, відкрий «Налаштування → Дані сайту» і завантаж файл. Або додай пісню кнопкою «+ Пісня»."},
+    {id:"gig",name:"Виступ",about:"Сетлист найближчого виступу в порядку виконання. Пісні додаються зі списку «Граємо».",empty:"У виступі ще немає пісень. Відкрий «Граємо» і натисни «У виступ» біля потрібних."},
+    {id:"project",name:"Проєкти",about:"Що хочемо зіграти в майбутньому або не встигаємо дотренувати до цього виступу.",empty:"Проєктів поки немає."},
+    {id:"vote",name:"Голосування",about:"Пропозиції нових пісень. Голосуй «За», а коли пісня набере підтримку — бери її в тренування.",empty:"Пропозицій поки немає. Додай свою кнопкою «+ Запропонувати»."},
+    {id:"archive",name:"Архів",about:"Пісні, які колись вчили, але зараз не граємо. Звідси можна повернути пісню для нового виступу.",empty:"В архіві поки нічого немає."}
+  ];
+  const STATUS_NAME={current:"Граємо",project:"Проєкти",vote:"Голосування",archive:"Архів"};
+  const statusOf=s=>["current","project","vote","archive"].includes(s&&s.status)?s.status:"current";
+  let curList="current"; try{ const v=localStorage.getItem("songList"); if(LISTS.some(l=>l.id===v)) curList=v; }catch(_){}
+  const votesOf=s=>Array.isArray(s&&s.votes)?s.votes.filter(v=>typeof v==="string"&&v):[];
+  function inList(id){
+    id=id||curList;
+    if(id==="gig") return songs.filter(s=>statusOf(s)==="current"&&s.gig).sort((a,b)=>(a.gigOrder??1e9)-(b.gigOrder??1e9)||(a.order??1e9)-(b.order??1e9));
+    const arr=sorted().filter(s=>statusOf(s)===id);
+    if(id==="vote") return arr.sort((a,b)=>votesOf(b).length-votesOf(a).length||(a.order??1e9)-(b.order??1e9));
+    return arr;
+  }
+  let gig=null;
 
   // practice + rating helpers
   const pad=n=>String(n).padStart(2,"0");
@@ -792,7 +852,19 @@ button.big{font-size:1rem;padding:12px 18px}
     const n=cmtCount(s.id), hasText=!!(s.lyrics&&s.lyrics.trim());
     return `<button type="button" class="ib${hasText?"":" empty"}" data-lyr="${esc(s.id)}" aria-label="Текст пісні">${ICON.text}Текст</button>
       <button type="button" class="ib" data-cmt="${esc(s.id)}" aria-label="Коментарі: ${n}">${ICON.cmt}Коментар${n?` <span class="cnt">${n}</span>`:""}</button>
-      ${canWrite?`<button type="button" class="ib reh" data-reh="${esc(s.id)}" aria-pressed="${!!s.rehearsal}">${ICON.reh}${s.rehearsal?"На репетиції":"На репетицію"}</button>`:(s.rehearsal?`<span class="reh-tag">на репетицію</span>`:"")}`;
+      ${canWrite&&statusOf(s)!=="vote"?`<button type="button" class="ib reh" data-reh="${esc(s.id)}" aria-pressed="${!!s.rehearsal}">${ICON.reh}${s.rehearsal?"На репетиції":"На репетицію"}</button>`:(s.rehearsal?`<span class="reh-tag">на репетицію</span>`:"")}
+      ${listBtns(s)}`;
+  }
+  function listBtns(s){
+    if(!canWrite) return "";
+    const st=statusOf(s), b=(to,label)=>`<button type="button" class="ib" data-st="${esc(s.id)}" data-to="${to}">${label}</button>`;
+    if(curList==="gig") return `<button type="button" class="ib" data-gig="${esc(s.id)}">Прибрати з виступу</button>`;
+    if(st==="current") return `<button type="button" class="ib tg" data-gig="${esc(s.id)}" aria-pressed="${!!s.gig}">${s.gig?"У виступі":"У виступ"}</button>${b("project","У проєкти")}${b("archive","В архів")}`;
+    if(st==="project") return `${b("current","Граємо")}${b("archive","В архів")}`;
+    if(st==="archive") return `${b("current","Повернути в «Граємо»")}${b("project","У проєкти")}`;
+    if(st==="vote"){ const v=votesOf(s), mine=!!me&&v.includes(me);
+      return `<span class="vote-box"><button type="button" class="ib tg" data-vote="${esc(s.id)}" aria-pressed="${mine}">👍 За${v.length?` <span class="cnt">${v.length}</span>`:""}</button>${v.length?`<span class="vote-who">${esc(v.join(", "))}</span>`:""}</span>${b("current","Беремо в тренування")}${b("project","У проєкти")}`; }
+    return "";
   }
   const geniusUrl=s=>`https://genius.com/search?q=${qs(s)}`;
   const mxmUrl=s=>`https://www.musixmatch.com/search?query=${qs(s)}`;
@@ -814,7 +886,8 @@ button.big{font-size:1rem;padding:12px 18px}
   function filtersActive(){return !!($("#q").value.trim()||$("#f-tuning").value||$("#f-preset").value||$("#f-key").value||$("#f-rate").value||$("#f-reh").value)}
   function renderList(){
     if(openId) return;
-    const all=sorted(); const q=$("#q").value.trim().toLowerCase();
+    renderLists();
+    const all=inList(); const q=$("#q").value.trim().toLowerCase();
     const ft=$("#f-tuning").value, fp=$("#f-preset").value, fk=$("#f-key").value, fr=$("#f-rate").value, fh=$("#f-reh").value, fv=$("#f-voc").value, sort=$("#sort").value;
     let list=all.filter(s=>{
       if(q && !(`${s.title} ${s.artist}`.toLowerCase().includes(q))) return false;
@@ -843,13 +916,15 @@ button.big{font-size:1rem;padding:12px 18px}
       voc:(a,b)=>vocRank(a)-vocRank(b)
     }[sort];
     if(cmp) list=list.slice().sort((a,b)=>cmp(a,b)||pos(a)-pos(b));
-    const fa=filtersActive(), canMove=!fa&&sort==="order"&&canWrite;
+    const fa=filtersActive(), canMove=!fa&&sort==="order"&&canWrite&&curList!=="vote";
     const nActive=[$("#q").value.trim(),$("#f-tuning").value,$("#f-preset").value,$("#f-key").value,$("#f-rate").value,$("#f-reh").value,$("#f-voc").value].filter(Boolean).length+(sort!=="order"?1:0);
     $("#fcount").hidden=!nActive; $("#fcount").textContent=nActive;
     $("#reorder-hint").hidden=canMove||!canWrite||!list.length;
     const nReh=all.filter(x=>x.rehearsal).length;
-    $("#count").textContent=loaded?(fa?`Показано ${list.length} з ${all.length}`:`${all.length} ${plural(all.length,"пісня","пісні","пісень")} у сетлисті`)+(nReh?` · на репетицію: ${nReh}`:""):"Завантажую пісні…";
+    const L=LISTS.find(l=>l.id===curList);
+    $("#count").textContent=loaded?(fa?`Показано ${list.length} з ${all.length}`:`${all.length} ${plural(all.length,"пісня","пісні","пісень")} · ${L.name}`)+(nReh?` · на репетицію: ${nReh}`:""):"Завантажую пісні…";
     $("#empty").hidden=!(loaded&&!all.length);
+    $("#empty").innerHTML=`<h3>${esc(L.name)}: порожньо</h3><p class="muted">${esc(L.empty)}</p>`;
     const today=todayStr();
     $("#songs").innerHTML=list.map(s=>{
       const p=pos(s), k=keyOf(s), r=rateOf(s), n=logOf(s).length, ds=daysSince(s), done=logOf(s).includes(today);
@@ -907,9 +982,12 @@ button.big{font-size:1rem;padding:12px 18px}
     const lb=e.target.closest("[data-lyr]"); if(lb){ e.stopPropagation(); openLyrics(lb.dataset.lyr); return; }
     const cb2=e.target.closest("[data-cmt]"); if(cb2){ e.stopPropagation(); openComments(cb2.dataset.cmt); return; }
     const rb=e.target.closest("[data-reh]"); if(rb){ e.stopPropagation(); toggleReh(rb.dataset.reh); return; }
+    const stb=e.target.closest("[data-st]"); if(stb){ e.stopPropagation(); setStatus(stb.dataset.st,stb.dataset.to); return; }
+    const gb=e.target.closest("[data-gig]"); if(gb){ e.stopPropagation(); toggleGig(gb.dataset.gig); return; }
+    const vb=e.target.closest("[data-vote]"); if(vb){ e.stopPropagation(); toggleVote(vb.dataset.vote); return; }
     if(e.target.closest("[data-noopen]")){ e.stopPropagation(); return; }
     const mv=e.target.closest("[data-mv]");
-    if(mv){ e.stopPropagation(); const arr=sorted(); const i=arr.findIndex(s=>s.id===mv.dataset.id); moveTo(mv.dataset.id,i+Number(mv.dataset.mv)); return; }
+    if(mv){ e.stopPropagation(); moveInList(mv.dataset.id,Number(mv.dataset.mv)); return; }
     const row=e.target.closest("[data-open]"); if(row) openCard(row.dataset.open);
   });
   $("#songs").addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.classList.contains("row")){ openCard(e.target.dataset.open);} });
@@ -921,8 +999,11 @@ button.big{font-size:1rem;padding:12px 18px}
 
   $("#add-song").addEventListener("click",async()=>{
     if(!db||!canWrite) return;
-    const order=sorted().length+1;
-    const body={title:"Нова пісня",artist:"",order,tuning:"E",keyShift:0,bpm:"",preset:"",ctl:"",notes:"",sections:[],pdfs:[]};
+    const order=songs.reduce((m,x)=>Math.max(m,Number(x.order)||0),0)+1;
+    const status=curList==="gig"?"current":curList;
+    const body={title:curList==="vote"?"Нова пропозиція":"Нова пісня",artist:"",order,status,tuning:"E",keyShift:0,bpm:"",preset:"",ctl:"",notes:"",sections:[],pdfs:[]};
+    if(curList==="gig"){ body.gig=true; body.gigOrder=inList("gig").length+1; }
+    if(curList==="vote"&&me) body.votes=[me];
     try{ const ref=await db.collection("songs").add(body); songs.push({id:ref.id,...body}); openCard(ref.id); }
     catch(e){ $("#count").textContent="Не вдалося додати пісню. Спробуй ще раз."; }
   });
@@ -967,7 +1048,8 @@ button.big{font-size:1rem;padding:12px 18px}
       <div class="grid">
         <label class="f w2">Назва<input id="c-title" value="${esc(d.title)}" ${ro?"disabled":""}></label>
         <label class="f w2">Виконавець<input id="c-artist" value="${esc(d.artist)}" ${ro?"disabled":""}></label>
-        <label class="f">Номер у сетлисті<input id="c-pos" type="number" min="1" max="${all.length}" value="${pos}" ${ro?"disabled":""}></label>
+        <label class="f">Список<select id="c-status" ${ro?"disabled":""}>${Object.entries(STATUS_NAME).map(([v,l])=>opt(v,l,statusOf(d))).join("")}</select></label>
+        <label class="f">Загальний номер<input id="c-pos" type="number" min="1" max="${all.length}" value="${pos}" ${ro?"disabled":""}></label>
         <label class="f">Стрій<select id="c-tuning" ${ro?"disabled":""}>${tunOpts}</select></label>
         <label class="f">Тональність<select id="c-key" ${ro?"disabled":""}>${keyOpts}</select></label>
         <label class="f">BPM<input id="c-bpm" inputmode="numeric" value="${esc(d.bpm)}" placeholder="120" ${ro?"disabled":""}></label>
@@ -1079,7 +1161,7 @@ button.big{font-size:1rem;padding:12px 18px}
   function bodyFrom(d){
     return {title:d.title||"",artist:d.artist||"",order:d.order,tuning:d.tuning||"E",keyShift:Number(d.keyShift||0),bpm:String(d.bpm||""),
       preset:d.preset||"",ctl:d.ctl||"",notes:d.notes||"",rating:rateOf(d),practiceLog:logOf(d),
-      lessonUrl:safeUrl(d.lessonUrl),songUrl:safeUrl(d.songUrl),ugUrl:safeUrl(d.ugUrl),lyrics:String(d.lyrics||""),lyricsUrl:safeUrl(d.lyricsUrl),rehearsal:!!d.rehearsal,vocals:vocsOf(d),
+      lessonUrl:safeUrl(d.lessonUrl),songUrl:safeUrl(d.songUrl),ugUrl:safeUrl(d.ugUrl),lyrics:String(d.lyrics||""),lyricsUrl:safeUrl(d.lyricsUrl),rehearsal:!!d.rehearsal,vocals:vocsOf(d),status:statusOf(d),gig:!!d.gig&&statusOf(d)==="current",gigOrder:d.gigOrder??null,votes:votesOf(d),
       sections:(d.sections||[]).map(p=>({name:p.name||"",chords:p.chords||"",note:p.note||""})),
       pdfs:(d.pdfs||[]).map(f=>({id:f.id,name:f.name||""}))};
   }
@@ -1087,6 +1169,7 @@ button.big{font-size:1rem;padding:12px 18px}
     const st=$("#status"); if(st){st.textContent="Зберігаю…"; st.className="status";}
     try{
       const cur=songs.find(s=>s.id===openId); draft.order=cur?cur.order:draft.order;
+      if(cur){ draft.votes=votesOf(cur); draft.gig=!!cur.gig; draft.gigOrder=cur.gigOrder??null; }
       const body=bodyFrom(draft);
       await db.doc("songs/"+openId).set(body);
       Object.assign(cur,body);
@@ -1606,8 +1689,142 @@ button.big{font-size:1rem;padding:12px 18px}
   const rehClearHandler=$("#reh-clear").onclick;
   function restoreRehClear(){ $("#reh-clear-wrap").innerHTML=`<button type="button" class="ghost" id="reh-clear">Очистити план репетиції</button>`; $("#reh-clear").onclick=rehClearHandler; }
 
+  // ---------- song lists ----------
+  function renderLists(){
+    const n=id=>inList(id).length;
+    $("#lists").innerHTML=LISTS.map(l=>`<button type="button" data-list="${l.id}" aria-pressed="${l.id===curList}">${esc(l.name)}<span class="n">${loaded?n(l.id):""}</span></button>`).join("");
+    const L=LISTS.find(l=>l.id===curList); $("#list-about").textContent=L.about;
+    $("#add-song").textContent=curList==="vote"?"+ Запропонувати":"+ Пісня";
+    renderGigHead();
+  }
+  $("#lists").addEventListener("click",e=>{ const b=e.target.closest("[data-list]"); if(!b) return; curList=b.dataset.list; try{localStorage.setItem("songList",curList)}catch(_){} renderList(); });
+  let gigEdit=false;
+  function renderGigHead(){
+    const box=$("#gig-head"); box.hidden=curList!=="gig"; if(box.hidden) return;
+    const g=gig||{}, n=inList("gig").length;
+    if(gigEdit){
+      box.innerHTML=`<form id="gig-form"><label class="f">Назва виступу<input name="title" value="${esc(g.title)}" placeholder="Концерт у клубі"></label>
+        <label class="f">Дата<input name="date" type="date" value="${esc(g.date)}"></label>
+        <label class="f">Місце<input name="place" value="${esc(g.place)}" placeholder="Клуб, адреса"></label>
+        <span class="gig-acts"><button class="primary" type="submit">Зберегти</button><button type="button" id="gig-cancel">Скасувати</button></span></form>`;
+      $("#gig-form").onsubmit=async e=>{ e.preventDefault(); const f=new FormData(e.target); const body={title:String(f.get("title")||"").trim(),date:String(f.get("date")||""),place:String(f.get("place")||"").trim()};
+        try{ await db.doc("meta/gig").set(body); gig=body; gigEdit=false; renderGigHead(); }catch(_){ box.insertAdjacentHTML("beforeend",`<p class="status err">Не вдалося зберегти. Спробуй ще раз.</p>`); } };
+      $("#gig-cancel").onclick=()=>{ gigEdit=false; renderGigHead(); };
+      return;
+    }
+    const date=g.date?new Date(g.date+"T12:00:00").toLocaleDateString("uk-UA",{day:"numeric",month:"long",year:"numeric"}):"";
+    box.innerHTML=`<h2>${esc(g.title||"Найближчий виступ")}</h2>
+      <p class="muted" style="margin:0">${[date,g.place].filter(Boolean).map(esc).join(" · ")||"Дату й місце ще не вказано."} · ${n} ${plural(n,"пісня","пісні","пісень")}</p>
+      ${canWrite?`<span class="gig-acts"><button type="button" id="gig-edit">Змінити дату й місце</button>${n?`<span id="gig-clear-wrap"><button type="button" class="ghost" id="gig-clear">Очистити виступ</button></span>`:""}</span>`:""}`;
+    if($("#gig-edit")) $("#gig-edit").onclick=()=>{ gigEdit=true; renderGigHead(); };
+    if($("#gig-clear")) $("#gig-clear").onclick=()=>{
+      $("#gig-clear-wrap").innerHTML=`<span class="confirm">Прибрати всі ${n} ${plural(n,"пісню","пісні","пісень")} з виступу? <button type="button" class="danger" id="gig-yes">Так</button> <button type="button" id="gig-no">Ні</button></span>`;
+      $("#gig-no").onclick=renderGigHead;
+      $("#gig-yes").onclick=async()=>{ for(const s of inList("gig")){ try{ await db.doc("songs/"+s.id).update({gig:false,gigOrder:null}); s.gig=false; s.gigOrder=null; }catch(_){} } renderList(); };
+    };
+  }
+  async function setStatus(id,to){
+    const s=songs.find(x=>x.id===id); if(!s||!db) return;
+    const order=songs.reduce((m,x)=>Math.max(m,Number(x.order)||0),0)+1;
+    const patch={status:to,order}; if(to!=="current"){ patch.gig=false; patch.gigOrder=null; }
+    const prev={status:s.status,order:s.order,gig:s.gig,gigOrder:s.gigOrder}; Object.assign(s,patch); renderList();
+    try{ await db.doc("songs/"+id).update(patch); }catch(_){ Object.assign(s,prev); renderList(); }
+  }
+  async function toggleGig(id){
+    const s=songs.find(x=>x.id===id); if(!s||!db) return;
+    const on=!s.gig, patch={gig:on,gigOrder:on?inList("gig").length+1:null};
+    const prev={gig:s.gig,gigOrder:s.gigOrder}; Object.assign(s,patch); renderList();
+    try{ await db.doc("songs/"+id).update(patch); }catch(_){ Object.assign(s,prev); renderList(); }
+  }
+  async function toggleVote(id){
+    const s=songs.find(x=>x.id===id); if(!s||!db||!me) return;
+    const v=votesOf(s), votes=v.includes(me)?v.filter(x=>x!==me):[...v,me];
+    const prev=s.votes; s.votes=votes; renderList();
+    try{ await db.doc("songs/"+id).update({votes}); }catch(_){ s.votes=prev; renderList(); }
+  }
+  async function moveInList(id,dir){
+    const arr=inList(), i=arr.findIndex(s=>s.id===id), j=i+dir; if(i<0||j<0||j>=arr.length) return;
+    const key=curList==="gig"?"gigOrder":"order";
+    const slots=curList==="gig"?arr.map((_,k)=>k+1):arr.map(s=>Number(s.order)||0);
+    const [m]=arr.splice(i,1); arr.splice(j,0,m);
+    if(key==="order"&&new Set(slots).size!==slots.length){ await writeOrder(sorted()); return moveInList(id,dir); }
+    for(let k=0;k<arr.length;k++){ if(arr[k][key]!==slots[k]){ arr[k][key]=slots[k]; try{ await db.doc("songs/"+arr[k].id).update({[key]:slots[k]}); }catch(e){ console.warn(e); } } }
+    renderList();
+  }
+
+  // ---------- settings: tiles ----------
+  const GUITAR_GEAR="Гітара — ESP LTD EC-256\nПроцесор — Boss ME-90\nBluetooth — адаптер BT-DUAL у ME-90 (треки з Moises)\nПідсилювач удома — Boss Katana-50 Gen 3\nНавушники — у PHONES на ME-90\nЗастосунки — BOSS Tone Studio, Moises";
+  const SUGG=["Вокал","Бас-гітара","Барабани","Клавішні","Акустична гітара","Ритм-гітара","Звук і мікшер"];
+  const PLACES=[["home","Вдома"],["rehearsal","На репетиції"],["gig","На виступі"],["notes","Нотатки"]];
+  let secs=[], secsLoaded=false, secId="", secEdit=false, secAdd=false, secDel=false;
+  const secDoc=id=>{ const d=secs.find(x=>x.id===id); if(id==="guitar") return {title:"Електрогітара",gear:GUITAR_GEAR,owner:"Ігор",...(d||{}),id}; return d||null; };
+  const firstLine=t=>String(t||"").split("\n").map(x=>x.trim()).filter(Boolean)[0]||"";
+  function gearHtml(t){
+    const lines=String(t||"").split("\n").map(x=>x.trim()).filter(Boolean); if(!lines.length) return `<p class="muted" style="margin:0">Ще не заповнено.</p>`;
+    return `<dl class="kv">${lines.map(l=>{ const m=/^(.+?)\s+[—–-]\s+(.+)$/.exec(l)||/^([^:]+):\s*(.+)$/.exec(l); return m?`<dt>${esc(m[1])}</dt><dd>${esc(m[2])}</dd>`:`<dd style="grid-column:1/-1">${esc(l)}</dd>`; }).join("")}</dl>`;
+  }
+  function renderTiles(){
+    const custom=secs.filter(x=>x.id!=="guitar").sort((a,b)=>(a.created||"").localeCompare(b.created||""));
+    const g=secDoc("guitar"), hasData=!!$("#sec-static-data").children.length;
+    const tile=(id,title,desc,ico)=>`<button type="button" class="tile" data-sec="${esc(id)}"><span class="ico">${esc(ico)}</span><b>${esc(title)}</b><span class="d">${esc(desc)}</span></button>`;
+    let h=tile("guitar",g.title,firstLine(g.gear)+" · підключення, пресети ME-90, CTL","Г");
+    h+=custom.map(c=>tile(c.id,c.title||"Розділ",firstLine(c.gear)||"Налаштування ще не заповнені",(c.title||"Р").trim().charAt(0).toUpperCase())).join("");
+    if(hasData) h+=tile("data","Дані сайту","Резервна копія і перенесення даних","Д");
+    if(canWrite&&db) h+=secAdd?`<form class="tile" id="sec-add-form" style="cursor:default"><b>Новий розділ</b><label class="f">Назва<input name="title" required maxlength="60" placeholder="Напр. Бас-гітара"></label>
+        <span class="sugg">${SUGG.filter(x=>!custom.some(c=>(c.title||"").toLowerCase()===x.toLowerCase())).map(x=>`<button type="button" class="ghost" data-sugg="${esc(x)}">${esc(x)}</button>`).join("")}</span>
+        <span class="gig-acts"><button class="primary" type="submit">Додати</button><button type="button" id="sec-add-cancel">Скасувати</button></span></form>`
+      :`<button type="button" class="tile add" id="sec-add"><span class="ico">+</span><b>Додати розділ</b><span class="d">Вокал, бас, барабани, звук…</span></button>`;
+    $("#tiles").innerHTML=h;
+    if($("#sec-add")) $("#sec-add").onclick=()=>{ secAdd=true; renderTiles(); $("#sec-add-form [name=title]").focus(); };
+    if($("#sec-add-form")){
+      $("#sec-add-cancel").onclick=()=>{ secAdd=false; renderTiles(); };
+      $("#sec-add-form").querySelectorAll("[data-sugg]").forEach(b=>b.onclick=()=>{ $("#sec-add-form [name=title]").value=b.dataset.sugg; });
+      $("#sec-add-form").onsubmit=async e=>{ e.preventDefault(); const title=String(new FormData(e.target).get("title")||"").trim(); if(!title) return;
+        const body={title,gear:"",home:"",rehearsal:"",gig:"",notes:"",owner:me||"",created:new Date().toISOString()};
+        try{ const ref=await db.collection("sections").add(body); secs.push({id:ref.id,...body}); secAdd=false; secEdit=true; location.hash="#setup/"+ref.id; }catch(_){ e.target.insertAdjacentHTML("beforeend",`<p class="status err">Не вдалося додати. Спробуй ще раз.</p>`); } };
+    }
+  }
+  $("#tiles").addEventListener("click",e=>{ const t=e.target.closest("[data-sec]"); if(t){ secEdit=false; location.hash="#setup/"+t.dataset.sec; } });
+  $("#sec-back").onclick=()=>{ location.hash="#setup"; };
+  function renderSec(){
+    const id=secId; $("#setup-home").hidden=!!id; $("#setup-sec").hidden=!id;
+    $("#sec-static-guitar").hidden=id!=="guitar"; $("#sec-static-data").hidden=id!=="data";
+    if(!id){ renderTiles(); return; }
+    const body=$("#sec-body"), tools=$("#sec-tools");
+    if(id==="data"){ $("#sec-title").textContent="Дані сайту"; tools.innerHTML=""; body.innerHTML=""; return; }
+    const d=secDoc(id);
+    if(!d){ $("#sec-title").textContent=secsLoaded?"Розділ не знайдено":"Завантажую…"; tools.innerHTML=""; body.innerHTML=secsLoaded?`<p class="muted">Можливо, його видалили. Повернись до всіх розділів.</p>`:""; return; }
+    $("#sec-title").textContent=d.title||"Розділ";
+    const isG=id==="guitar", fields=isG?[["gear","Обладнання"],["notes","Нотатки"]]:[["gear","Обладнання"],...PLACES];
+    if(secEdit&&canWrite&&db){
+      tools.innerHTML="";
+      body.innerHTML=`<form class="sec-form" id="sec-form">
+        ${isG?"":`<label class="f">Назва розділу<input name="title" value="${esc(d.title)}" required maxlength="60"></label>`}
+        ${fields.map(([k,l])=>`<label class="f">${esc(l)}<textarea name="${k}" placeholder="${k==="gear"?"Кожен пристрій з нового рядка: Назва — модель":"Як підключаєш і що налаштовуєш"}">${esc(d[k])}</textarea></label>`).join("")}
+        <p class="note">В «Обладнанні» пиши кожен пристрій з нового рядка у форматі «Що — модель», тоді він покажеться таблицею.</p>
+        <span class="gig-acts"><button class="primary" type="submit">Зберегти</button><button type="button" id="sec-cancel">Скасувати</button>${isG?"":`<span id="sec-del-wrap"><button type="button" class="ghost" id="sec-del">Видалити розділ</button></span>`}</span>
+        <p class="status" id="sec-status"></p></form>`;
+      $("#sec-cancel").onclick=()=>{ secEdit=false; renderSec(); };
+      if($("#sec-del")) $("#sec-del").onclick=()=>{ $("#sec-del-wrap").innerHTML=`<span class="confirm">Видалити «${esc(d.title)}» назавжди? <button type="button" class="danger" id="sec-yes">Так</button> <button type="button" id="sec-no">Ні</button></span>`;
+        $("#sec-no").onclick=renderSec; $("#sec-yes").onclick=async()=>{ try{ await db.doc("sections/"+id).delete(); secs=secs.filter(x=>x.id!==id); secEdit=false; location.hash="#setup"; }catch(_){ $("#sec-status").className="status err"; $("#sec-status").textContent="Не вдалося видалити."; } }; };
+      $("#sec-form").onsubmit=async e=>{ e.preventDefault(); const f=new FormData(e.target), nb={...d}; delete nb.id;
+        if(!isG) nb.title=String(f.get("title")||"").trim()||d.title; fields.forEach(([k])=>nb[k]=String(f.get(k)||""));
+        $("#sec-status").className="status"; $("#sec-status").textContent="Зберігаю…";
+        try{ await db.doc("sections/"+id).set(nb); const i=secs.findIndex(x=>x.id===id); if(i>=0) secs[i]={id,...nb}; else secs.push({id,...nb}); secEdit=false; renderSec(); }
+        catch(_){ $("#sec-status").className="status err"; $("#sec-status").textContent="Не вдалося зберегти. Спробуй ще раз."; } };
+      return;
+    }
+    tools.innerHTML=canWrite&&db?`<button type="button" id="sec-edit">Редагувати</button>`:"";
+    if($("#sec-edit")) $("#sec-edit").onclick=()=>{ secEdit=true; renderSec(); };
+    const cards=fields.filter(([k])=>k==="gear"||String(d[k]||"").trim()).map(([k,l])=>`<section class="sec-card"><h3>${esc(l)}</h3>${k==="gear"?gearHtml(d.gear):`<p class="txt">${esc(d[k])}</p>`}</section>`).join("");
+    const emptyPlaces=!isG&&!PLACES.some(([k])=>String(d[k]||"").trim());
+    body.innerHTML=`<div class="sec-grid">${cards}</div>${emptyPlaces?`<p class="note">Додай, як налаштовуєш звук удома, на репетиції і на виступі — кнопкою «Редагувати».</p>`:""}`;
+  }
+  window.__setupRoute=id=>{ if(id!==secId){ secId=id; if(!id) secEdit=secEdit&&false; } renderSec(); if(id) scrollTo(0,0); };
+  route();
+
   // ---------- data backup / import ----------
-  const COLLS=["songs","presets","lessons","comments","library"];
+  const COLLS=["songs","presets","lessons","comments","library","sections","meta"];
   $("#data-export").onclick=async()=>{
     const st=$("#data-status"); if(!db){ st.textContent="Спершу увійди на сайт."; return; }
     st.className="status"; st.textContent="Збираю дані…";
@@ -1665,6 +1882,11 @@ button.big{font-size:1rem;padding:12px 18px}
       cheat=snap.exists?JSON.parse(JSON.stringify(snap.data())):null; cheatLoaded=true;
       if(!$("#cheat-modal").hidden&&!cheatEdit) renderCheat();
     },()=>{ cheatLoaded=true; });
+    db.collection("sections").onSnapshot(snap=>{
+      secs=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))})); secsLoaded=true;
+      if(!secEdit&&!secAdd) renderSec();
+    },()=>{ secsLoaded=true; });
+    db.doc("meta/gig").onSnapshot(snap=>{ gig=snap.exists?JSON.parse(JSON.stringify(snap.data())):null; if(!gigEdit&&!openId) renderGigHead(); },()=>{});
     db.collection("presets").onSnapshot(snap=>{
       presets=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))}));
       presetsLoaded=true;

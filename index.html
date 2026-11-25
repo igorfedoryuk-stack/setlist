@@ -344,6 +344,7 @@ button.big{font-size:1rem;padding:12px 18px}
 .who-bar{display:flex;gap:6px;align-items:center;font-size:.82rem;color:var(--muted);flex-wrap:wrap}
 .who-bar b{color:var(--fg)}
 .who-bar button{padding:4px 8px;font-size:.78rem}
+.who-bar a.who-help{color:var(--accent);font-weight:600;font-size:.78rem}
 </style>
 </head>
 <body>
@@ -355,6 +356,7 @@ button.big{font-size:1rem;padding:12px 18px}
     <div id="gate-login" hidden style="display:grid;gap:12px">
       <p>Сайт відкритий лише для учасників гурту. Увійди через свій Google-акаунт.</p>
       <button type="button" class="primary big" id="gate-google">Увійти через Google</button>
+      <a href="guide.html" class="muted">Як користуватися сайтом →</a>
     </div>
     <div id="gate-denied" hidden style="display:grid;gap:12px">
       <h2>Немає доступу</h2>
@@ -378,7 +380,7 @@ button.big{font-size:1rem;padding:12px 18px}
         <h1 class="wm"><span class="wm-main">Strangers</span><span class="wm-sub">cover band · Kyiv · Ukraine</span></h1>
       </div>
       <p class="crew" id="crew" aria-label="Склад гурту"></p>
-      <span class="who-bar">Ти: <b id="who-name">—</b> <button type="button" class="ghost" id="band-logout">вийти</button></span>
+      <span class="who-bar">Ти: <b id="who-name">—</b> <a href="guide.html" class="who-help">довідка</a> <button type="button" class="ghost" id="band-logout">вийти</button></span>
     </div>
     <nav class="tabs" aria-label="Розділи">
       <a href="#songs" id="tab-songs">Пісні</a>

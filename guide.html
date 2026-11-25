@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Як користуватися сайтом</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 31C10 25 2 16 2 9 2 3 8 1 16 1s14 2 14 8c0 7-8 16-14 22z' fill='%23c4471c'/%3E%3Ctext x='16' y='20' text-anchor='middle' font-family='serif' font-weight='700' font-size='17' fill='%23f1ece2'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@600&family=Metal+Mania&display=swap">
+<style>
+:root{--bg:#f1efe9;--fg:#1d1d1b;--muted:#5e5d57;--line:#d6d3ca;--surface:#fbfbf7;--accent:#c4471c;--accent-soft:#f6e3d9;
+  --f-display:"Barlow Condensed",system-ui,sans-serif;--f-body:"IBM Plex Sans",system-ui,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151714;--fg:#ecebe4;--muted:#a3a197;--line:#34372f;--surface:#1d201b;--accent:#ff7d4a;--accent-soft:#3a2219;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151714;--fg:#ecebe4;--muted:#a3a197;--line:#34372f;--surface:#1d201b;--accent:#ff7d4a;--accent-soft:#3a2219;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 var(--f-body)}
+.wrap{max-width:980px;margin:0 auto;padding:28px 16px 64px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:16px}
+header svg{width:44px;height:50px;flex:none}
+.wm{margin:0;display:grid;gap:4px}
+.wm b{font:400 2.2rem/.9 "Metal Mania",var(--f-display);transform:skewX(-8deg);display:inline-block;-webkit-text-stroke:1px #d4241c;paint-order:stroke fill}
+.wm span{font:600 .74rem/1 var(--f-mono);letter-spacing:.2em;color:var(--accent);text-transform:uppercase}
+header .grow{flex:1}
+a.btn{display:inline-block;padding:9px 14px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+h1{font:700 2.1rem/1.05 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:28px 0 6px}
+.lead{color:var(--muted);margin:0 0 8px;max-width:60ch}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 8px}
+nav.toc a{font:600 .8rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:7px 11px;background:var(--surface)}
+section.step{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start;padding:30px 0;border-top:1px solid var(--line)}
+section.step:nth-of-type(even){grid-template-columns:300px minmax(0,1fr)}
+section.step:nth-of-type(even) .shot{order:-1}
+.n{font:600 .78rem/1 var(--f-mono);color:var(--accent);letter-spacing:.08em}
+h2{font:700 1.6rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:6px 0 10px}
+p{margin:0 0 10px;max-width:62ch}
+ul{margin:0;padding-left:1.2em;display:grid;gap:6px;max-width:62ch}
+b.k{background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:4px;font-weight:600;white-space:nowrap}
+.shot{margin:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);box-shadow:0 6px 20px rgb(0 0 0/.08)}
+.shot img{display:block;width:100%;height:auto}
+.shot.tall{max-height:560px;overflow:auto}
+.note{border-left:3px solid var(--accent);background:var(--surface);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;font-size:.92rem}
+footer{border-top:1px solid var(--line);padding-top:20px;margin-top:10px;color:var(--muted)}
+@media (max-width:720px){section.step,section.step:nth-of-type(even){grid-template-columns:1fr;gap:16px}section.step:nth-of-type(even) .shot{order:0}.shot{max-width:360px}h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <svg viewBox="0 0 64 72" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ea6a32"/><stop offset="1" stop-color="#8f2c0e"/></linearGradient></defs><path d="M32 70C19 57 3 36 3 20 3 8 15 3 32 3s29 5 29 17c0 16-16 37-29 50z" fill="url(#g)"/><text x="32" y="47" text-anchor="middle" font-family="Metal Mania, serif" font-size="42" fill="#f1ece2">S</text></svg>
+  <p class="wm"><b>Strangers</b><span>cover band · Kyiv · Ukraine</span></p>
+  <span class="grow"></span>
+  <a class="btn" href="./">Відкрити сайт</a>
+</header>
+
+<h1>Як користуватися сайтом</h1>
+<p class="lead">Коротко про головне для нових учасників: де пісні, як голосувати за нові, як вести своє тренування і як готуємося до виступу. Скриншоти зроблені з прикладом даних.</p>
+<nav class="toc" aria-label="Зміст">
+  <a href="#login">Вхід</a><a href="#lists">Списки</a><a href="#vote">Голосування</a><a href="#mine">Моє тренування</a><a href="#gig">Виступ</a><a href="#card">Картка пісні</a><a href="#add">Нова пісня</a><a href="#setup">Налаштування</a>
+</nav>
+
+<section class="step" id="login">
+  <div><span class="n">01</span><h2>Вхід</h2>
+    <p>Натисни <b class="k">Увійти через Google</b> і вибери свою Google-пошту. Пускає лише тих, кого власник сайту додав до списку учасників.</p>
+    <p>Якщо бачиш «Немає доступу» — напиши Ігорю, яку пошту додати, або увійди іншим акаунтом.</p>
+    <p class="note">Сайт зручно додати на головний екран телефона: «Поділитися → На початковий екран».</p></div>
+  <figure class="shot"><img src="guide/1-login.png" alt="Екран входу з кнопкою «Увійти через Google»" loading="lazy"></figure>
+</section>
+
+<section class="step" id="lists">
+  <div><span class="n">02</span><h2>Списки пісень</h2>
+    <ul>
+      <li><b class="k">Граємо</b> — що гурт зараз грає.</li>
+      <li><b class="k">Виступ</b> — сетлист найближчого концерту.</li>
+      <li><b class="k">Проєкти</b> — на майбутнє або не встигаємо дотренувати.</li>
+      <li><b class="k">Голосування</b> — пропозиції нових пісень. Червоне число — скільки чекають на твій голос.</li>
+      <li><b class="k">Архів</b> — колись вивчене, зараз не граємо.</li>
+      <li><b class="k">Моє тренування</b> — твій особистий список.</li>
+    </ul>
+    <p style="margin-top:12px">У рядку пісні: зірки — <b>готовність гурту</b>, рядок «Я: ★★★» — твоя власна. Галочка <b class="k">реп.</b> — грали на репетиції сьогодні, <b class="k">я</b> — ти тренував сам. Кнопки під назвою переносять пісню між списками. Натисни на назву, щоб відкрити картку.</p></div>
+  <figure class="shot tall"><img src="guide/2-lists.png" alt="Перемикач списків і рядок пісні з кнопками" loading="lazy"></figure>
+</section>
+
+<section class="step" id="vote">
+  <div><span class="n">03</span><h2>Голосування</h2>
+    <ul>
+      <li>Голосуй <b class="k">👍 За</b>, <b class="k">👎 Проти</b> або <b class="k">✋ Утримуюсь</b>. Повторне натискання знімає голос.</li>
+      <li>Пісні без твого голосу підсвічені, мають мітку <b class="k">Нова</b> і стоять першими.</li>
+      <li>Галочка «Лише без мого голосу» залишає тільки їх.</li>
+      <li>Коли пісня набрала підтримку — <b class="k">Беремо в тренування</b>.</li>
+    </ul>
+    <p class="note">Голоси залишаються на пісні назавжди: у інших списках видно значок 👍2 · 👎1.</p></div>
+  <figure class="shot tall"><img src="guide/3-vote.png" alt="Список голосування з новою пропозицією" loading="lazy"></figure>
+</section>
+
+<section class="step" id="mine">
+  <div><span class="n">04</span><h2>Моє тренування</h2>
+    <ul>
+      <li>Список у кожного свій — інші його не бачать.</li>
+      <li>Додай будь-яку пісню кнопкою <b class="k">У моє</b> або нову пісню одразу сюди.</li>
+      <li>Тут власна готовність (1–5) і власний лічильник тренувань — окремо від гурту.</li>
+      <li>Свою нову пісню можна винести <b class="k">На голосування</b>.</li>
+    </ul>
+    <p class="note">Історія твоїх тренувань зберігається, навіть якщо пісню перенесли в інший список.</p></div>
+  <figure class="shot"><img src="guide/4-mine.png" alt="Особистий список тренування" loading="lazy"></figure>
+</section>
+
+<section class="step" id="gig">
+  <div><span class="n">05</span><h2>Виступ</h2>
+    <ul>
+      <li>У списку «Граємо» натисни <b class="k">У виступ</b> біля пісень для концерту.</li>
+      <li>У «Виступі» стрілками ▲▼ задай порядок виконання.</li>
+      <li><b class="k">Змінити дату й місце</b> — назва, дата і місце концерту.</li>
+      <li>Після концерту — <b class="k">Очистити виступ</b>.</li>
+    </ul></div>
+  <figure class="shot"><img src="guide/5-gig.png" alt="Блок найближчого виступу" loading="lazy"></figure>
+</section>
+
+<section class="step" id="card">
+  <div><span class="n">06</span><h2>Картка пісні</h2>
+    <p>Тут усе про пісню: стрій, тональність, BPM, пресет, вокаліст, структура з акордами, PDF, текст, посилання на розбір і коментарі.</p>
+    <ul>
+      <li><b class="k">Готовність гурту</b> і <b class="k">Репетиції гурту</b> — спільні для всіх.</li>
+      <li><b class="k">Моє тренування</b> — твоя оцінка й твої тренування.</li>
+      <li><b class="k">Голосування</b> — можна голосувати з будь-якого списку.</li>
+    </ul>
+    <p class="note">Зміни в полях зберігай кнопкою «Зберегти» внизу. Оцінки й галочки зберігаються одразу.</p></div>
+  <figure class="shot tall"><img src="guide/6-card.png" alt="Блоки готовності, тренувань і голосування в картці пісні" loading="lazy"></figure>
+</section>
+
+<section class="step" id="add">
+  <div><span class="n">07</span><h2>Нова пісня</h2>
+    <ul>
+      <li>Натисни <b class="k">+ Пісня</b> і вибери, куди: <b>на голосування</b> гурту або <b>у моє тренування</b>.</li>
+      <li><b>З YouTube</b> — встав посилання, сайт сам візьме назву й виконавця.</li>
+      <li><b>Вручну</b> — лише назва й виконавець.</li>
+      <li>Структуру, акорди й BPM додаєш потім у картці.</li>
+    </ul></div>
+  <figure class="shot"><img src="guide/7-add.png" alt="Вікно додавання нової пісні" loading="lazy"></figure>
+</section>
+
+<section class="step" id="setup">
+  <div><span class="n">08</span><h2>Налаштування</h2>
+    <ul>
+      <li>Плитки — розділи з обладнанням і налаштуваннями: вдома, на репетиції, на виступі.</li>
+      <li><b class="k">Електрогітара</b> — апарат Ігоря, підключення й пресети ME-90.</li>
+      <li><b class="k">Додати розділ</b> — заведи свій: вокал, клавіші, бас, звук…</li>
+      <li>У розділі натисни <b class="k">Редагувати</b>. Обладнання пиши рядками «Що — модель».</li>
+    </ul></div>
+  <figure class="shot"><img src="guide/8-setup.png" alt="Плитки розділів налаштувань" loading="lazy"></figure>
+</section>
+
+<footer>Питання чи ідеї — пиши в коментарях до пісні або Ігорю. <a href="./">← До сайту</a></footer>
+</div>
+</body>
+</html>

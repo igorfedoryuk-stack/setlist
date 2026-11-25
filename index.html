@@ -300,6 +300,25 @@ button.big{font-size:1rem;padding:12px 18px}
 .ib.tg[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
 .vote-box{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
 .vote-who{font-size:.8rem;color:var(--muted)}
+.lists .dot{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#d4241c;color:#fff;font:700 .7rem/18px var(--f-mono);text-align:center}
+.lists button.mine{border-style:dashed}
+.lists button.mine[aria-pressed="true"]{border-style:solid}
+.row.fresh{box-shadow:0 0 0 2px var(--accent) inset}
+.tag.fresh{background:#d4241c;color:#fff}
+.tag.tally{background:var(--chip);color:var(--fg);font-weight:600}
+.tag.st{background:none;border:1px dashed var(--line);color:var(--muted)}
+.ib.vote[aria-pressed="true"]{color:#fff;border-color:transparent}
+.ib.vote.up[aria-pressed="true"]{background:var(--ok)}.ib.vote.down[aria-pressed="true"]{background:#c0392b}.ib.vote.skip[aria-pressed="true"]{background:var(--muted)}
+.pracs{display:flex;gap:2px}
+.meta .my{color:var(--accent);font-weight:600}
+.list-about .unvoted{display:flex!important;flex-direction:row!important;gap:8px;align-items:center;margin:8px 0 0;font-weight:600;color:var(--fg);cursor:pointer;width:max-content;max-width:100%}
+.list-about .unvoted input{width:18px;height:18px;margin:0;flex:none}
+.add-box{width:min(560px,100%)}
+.add-box .modal-body{gap:16px}
+.dest{display:flex;gap:8px;flex-wrap:wrap}
+.dest button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.add-way{display:grid;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.add-way h3{margin:0;font:600 .8rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
 /* settings tiles */
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:18px}
 .tile{display:grid;gap:8px;align-content:start;text-align:left;padding:16px;min-height:128px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font:inherit;cursor:pointer;text-transform:none;letter-spacing:0}
@@ -792,17 +811,67 @@ button.big{font-size:1rem;padding:12px 18px}
     {id:"gig",name:"Виступ",about:"Сетлист найближчого виступу в порядку виконання. Пісні додаються зі списку «Граємо».",empty:"У виступі ще немає пісень. Відкрий «Граємо» і натисни «У виступ» біля потрібних."},
     {id:"project",name:"Проєкти",about:"Що хочемо зіграти в майбутньому або не встигаємо дотренувати до цього виступу.",empty:"Проєктів поки немає."},
     {id:"vote",name:"Голосування",about:"Пропозиції нових пісень. Голосуй «За», а коли пісня набере підтримку — бери її в тренування.",empty:"Пропозицій поки немає. Додай свою кнопкою «+ Запропонувати»."},
-    {id:"archive",name:"Архів",about:"Пісні, які колись вчили, але зараз не граємо. Звідси можна повернути пісню для нового виступу.",empty:"В архіві поки нічого немає."}
+    {id:"archive",name:"Архів",about:"Пісні, які колись вчили, але зараз не граємо. Звідси можна повернути пісню для нового виступу.",empty:"В архіві поки нічого немає."},
+    {id:"mine",name:"Моє тренування",about:"Твій особистий список: власна готовність і власні тренування. Його бачиш лише ти, а історія тренувань пісні зберігається, хоч би куди її перенесли.",empty:"Тут поки порожньо. Натисни «У моє» біля будь-якої пісні або додай нову кнопкою «+ Пісня»."}
   ];
-  const STATUS_NAME={current:"Граємо",project:"Проєкти",vote:"Голосування",archive:"Архів"};
-  const statusOf=s=>["current","project","vote","archive"].includes(s&&s.status)?s.status:"current";
+  const STATUS_NAME={current:"Граємо",project:"Проєкти",vote:"Голосування",archive:"Архів",solo:"Лише моє тренування"};
+  const statusOf=s=>["current","project","vote","archive","solo"].includes(s&&s.status)?s.status:"current";
+  // personal training + votes (separate docs per user, so nobody overwrites anybody)
+  let mineDocs=[], voteDocs=[], onlyUnvoted=false;
+  const uKey=()=>String(myEmail||me||"").toLowerCase();
+  const idSafe=x=>String(x).toLowerCase().replace(/[^a-z0-9]+/g,"_");
+  const myDoc=sid=>mineDocs.find(d=>d.user===uKey()&&d.songId===sid);
+  const myLog=sid=>{const d=myDoc(sid); return d&&Array.isArray(d.log)?d.log.filter(x=>typeof x==="string"):[]};
+  const myRate=sid=>{const d=myDoc(sid), r=Number(d&&d.rating||0); return r>=1&&r<=5?r:0};
+  const inMine=s=>statusOf(s)==="solo"?(s.owner===uKey()):!!(myDoc(s.id)&&myDoc(s.id).list);
+  async function saveMine(sid,patch){
+    if(!db||!uKey()) return;
+    const cur=myDoc(sid), nd={user:uKey(),songId:sid,rating:0,log:[],list:false,since:new Date().toISOString(),...(cur||{}),...patch,name:me||""}; delete nd.id;
+    const did=idSafe(uKey()+"__"+sid);
+    mineDocs=mineDocs.filter(d=>!(d.user===uKey()&&d.songId===sid)).concat([{id:did,...nd}]); refreshSongs();
+    try{ await db.doc("mine/"+did).set(nd); }catch(_){ mineDocs=mineDocs.filter(d=>d.id!==did).concat(cur?[cur]:[]); refreshSongs(); }
+  }
+  const VOTE={up:"👍",down:"👎",skip:"✋"}, VOTE_NAME={up:"За",down:"Проти",skip:"Утримуюсь"};
+  function votesFor(sid){
+    const list=voteDocs.filter(v=>v.songId===sid&&VOTE[v.v]).map(v=>({name:v.name||"Учасник",v:v.v,user:v.user}));
+    const s=songs.find(x=>x.id===sid), names=new Set(list.map(v=>v.name));
+    for(const n of votesOf(s||{})) if(!names.has(n)) list.push({name:n,v:"up",user:""});
+    return list;
+  }
+  const myVote=sid=>{const v=voteDocs.find(x=>x.songId===sid&&x.user===uKey()); if(v) return VOTE[v.v]?v.v:""; const s=songs.find(x=>x.id===sid); return s&&me&&votesOf(s).includes(me)?"up":"";};
+  const score=sid=>votesFor(sid).reduce((a,v)=>a+(v.v==="up"?1:v.v==="down"?-1:0),0);
+  function tallyHtml(sid){
+    const v=votesFor(sid); if(!v.length) return "";
+    const c=k=>v.filter(x=>x.v===k).length, who=v.map(x=>`${x.name}: ${VOTE_NAME[x.v]}`).join(", ");
+    return `<span class="tag tally" title="${esc(who)}">${["up","down","skip"].filter(k=>c(k)).map(k=>VOTE[k]+" "+c(k)).join(" · ")}</span>`;
+  }
+  function voteBtns(sid){
+    const mv=myVote(sid);
+    return ["up","down","skip"].map(k=>`<button type="button" class="ib vote ${k}" data-cast="${k}" data-id="${esc(sid)}" aria-pressed="${mv===k}">${VOTE[k]} ${VOTE_NAME[k]}</button>`).join("");
+  }
+  async function castVote(sid,k){
+    if(!db||!uKey()) return;
+    const did=idSafe(sid+"__"+uKey()), cur=voteDocs.find(x=>x.id===did), s=songs.find(x=>x.id===sid);
+    const legacy=s&&me&&votesOf(s).includes(me);
+    const remove=myVote(sid)===k;
+    voteDocs=voteDocs.filter(x=>x.id!==did); if(!remove) voteDocs.push({id:did,songId:sid,user:uKey(),name:me||"",v:k,at:new Date().toISOString()});
+    if(legacy){ s.votes=votesOf(s).filter(x=>x!==me); }
+    refreshSongs();
+    try{
+      if(remove){ if(cur) await db.doc("votes/"+did).delete(); } else await db.doc("votes/"+did).set({songId:sid,user:uKey(),name:me||"",v:k,at:new Date().toISOString()});
+      if(legacy) await db.doc("songs/"+sid).update({votes:s.votes});
+    }catch(_){ voteDocs=voteDocs.filter(x=>x.id!==did).concat(cur?[cur]:[]); refreshSongs(); }
+  }
+  const isFresh=s=>statusOf(s)==="vote"&&!myVote(s.id);
+  function refreshSongs(){ if(openId){ if(!dirty) renderCard(); } else renderList(); }
   let curList="current"; try{ const v=localStorage.getItem("songList"); if(LISTS.some(l=>l.id===v)) curList=v; }catch(_){}
   const votesOf=s=>Array.isArray(s&&s.votes)?s.votes.filter(v=>typeof v==="string"&&v):[];
   function inList(id){
     id=id||curList;
     if(id==="gig") return songs.filter(s=>statusOf(s)==="current"&&s.gig).sort((a,b)=>(a.gigOrder??1e9)-(b.gigOrder??1e9)||(a.order??1e9)-(b.order??1e9));
     const arr=sorted().filter(s=>statusOf(s)===id);
-    if(id==="vote") return arr.sort((a,b)=>votesOf(b).length-votesOf(a).length||(a.order??1e9)-(b.order??1e9));
+    if(id==="mine") return songs.filter(inMine).sort((a,b)=>String((myDoc(a.id)||{}).since||a.order).localeCompare(String((myDoc(b.id)||{}).since||b.order))||(a.order??1e9)-(b.order??1e9));
+    if(id==="vote") return arr.sort((a,b)=>(isFresh(b)-isFresh(a))||(isFresh(a)&&isFresh(b)?String(b.voteSince||"").localeCompare(String(a.voteSince||"")):0)||score(b.id)-score(a.id)||(a.order??1e9)-(b.order??1e9));
     return arr;
   }
   let gig=null;
@@ -818,7 +887,7 @@ button.big{font-size:1rem;padding:12px 18px}
   const rateOf=s=>{const r=Number(s.rating||0); return r>=1&&r<=5?r:0};
   const starsHtml=r=>r?`<span class="stars" aria-label="Готовність ${r} з 5"><b>${"★".repeat(r)}</b><span>${"★".repeat(5-r)}</span></span>`:`<span class="stars muted">без оцінки</span>`;
   const VOCALISTS=["Саша","Олексій","Алінка","Іванка"];
-  const BAND=[{email:"alina.cheremys@gmail.com",name:"Алінка",role:"Вокал"},{email:"igor.fedoryuk@gmail.com",name:"Ігор",role:"Соло електрогітара"}];
+  const BAND=[{email:"alina.cheremys@gmail.com",name:"Алінка",role:"Вокал"},{email:"igor.fedoryuk@gmail.com",name:"Ігор",role:"Соло електрогітара"},{email:"nogacrab@gmail.com",name:"Аня",role:"Клавіші"}];
   const roleByEmail=e=>{const m=BAND.find(b=>b.email===String(e||"").toLowerCase()); return m?m.role:"";};
   const roleByName=n=>{const m=BAND.find(b=>b.name===n); return m?m.role:"";};
   let myEmail=null, bandProf={}, cmtEmails={};
@@ -852,18 +921,19 @@ button.big{font-size:1rem;padding:12px 18px}
     const n=cmtCount(s.id), hasText=!!(s.lyrics&&s.lyrics.trim());
     return `<button type="button" class="ib${hasText?"":" empty"}" data-lyr="${esc(s.id)}" aria-label="Текст пісні">${ICON.text}Текст</button>
       <button type="button" class="ib" data-cmt="${esc(s.id)}" aria-label="Коментарі: ${n}">${ICON.cmt}Коментар${n?` <span class="cnt">${n}</span>`:""}</button>
-      ${canWrite&&statusOf(s)!=="vote"?`<button type="button" class="ib reh" data-reh="${esc(s.id)}" aria-pressed="${!!s.rehearsal}">${ICON.reh}${s.rehearsal?"На репетиції":"На репетицію"}</button>`:(s.rehearsal?`<span class="reh-tag">на репетицію</span>`:"")}
+      ${canWrite&&!["vote","solo"].includes(statusOf(s))&&curList!=="mine"?`<button type="button" class="ib reh" data-reh="${esc(s.id)}" aria-pressed="${!!s.rehearsal}">${ICON.reh}${s.rehearsal?"На репетиції":"На репетицію"}</button>`:(s.rehearsal?`<span class="reh-tag">на репетицію</span>`:"")}
       ${listBtns(s)}`;
   }
   function listBtns(s){
     if(!canWrite) return "";
     const st=statusOf(s), b=(to,label)=>`<button type="button" class="ib" data-st="${esc(s.id)}" data-to="${to}">${label}</button>`;
-    if(curList==="gig") return `<button type="button" class="ib" data-gig="${esc(s.id)}">Прибрати з виступу</button>`;
-    if(st==="current") return `<button type="button" class="ib tg" data-gig="${esc(s.id)}" aria-pressed="${!!s.gig}">${s.gig?"У виступі":"У виступ"}</button>${b("project","У проєкти")}${b("archive","В архів")}`;
-    if(st==="project") return `${b("current","Граємо")}${b("archive","В архів")}`;
-    if(st==="archive") return `${b("current","Повернути в «Граємо»")}${b("project","У проєкти")}`;
-    if(st==="vote"){ const v=votesOf(s), mine=!!me&&v.includes(me);
-      return `<span class="vote-box"><button type="button" class="ib tg" data-vote="${esc(s.id)}" aria-pressed="${mine}">👍 За${v.length?` <span class="cnt">${v.length}</span>`:""}</button>${v.length?`<span class="vote-who">${esc(v.join(", "))}</span>`:""}</span>${b("current","Беремо в тренування")}${b("project","У проєкти")}`; }
+    const mineBtn=st==="solo"?"":`<button type="button" class="ib tg" data-mine="${esc(s.id)}" aria-pressed="${inMine(s)}">${inMine(s)?"У моєму":"У моє"}</button>`;
+    if(curList==="mine") return `${["solo","project","archive"].includes(st)?b("vote","На голосування"):""}${st==="solo"?"":`<button type="button" class="ib" data-mine="${esc(s.id)}" aria-pressed="true">Прибрати з мого списку</button>`}`;
+    if(curList==="gig") return `<button type="button" class="ib" data-gig="${esc(s.id)}">Прибрати з виступу</button>${mineBtn}`;
+    if(st==="current") return `<button type="button" class="ib tg" data-gig="${esc(s.id)}" aria-pressed="${!!s.gig}">${s.gig?"У виступі":"У виступ"}</button>${b("project","У проєкти")}${b("archive","В архів")}${mineBtn}`;
+    if(st==="project") return `${b("current","Граємо")}${b("archive","В архів")}${b("vote","На голосування")}${mineBtn}`;
+    if(st==="archive") return `${b("current","Повернути в «Граємо»")}${b("project","У проєкти")}${b("vote","На голосування")}${mineBtn}`;
+    if(st==="vote") return `<span class="vote-box">${voteBtns(s.id)}${votesFor(s.id).length?`<span class="vote-who">${esc(votesFor(s.id).map(x=>VOTE[x.v]+" "+x.name).join(", "))}</span>`:""}</span>${b("current","Беремо в тренування")}${b("project","У проєкти")}${mineBtn}`;
     return "";
   }
   const geniusUrl=s=>`https://genius.com/search?q=${qs(s)}`;
@@ -887,7 +957,10 @@ button.big{font-size:1rem;padding:12px 18px}
   function renderList(){
     if(openId) return;
     renderLists();
-    const all=inList(); const q=$("#q").value.trim().toLowerCase();
+    const P=curList==="mine";
+    let all=inList().map(s=>P?{...s,rating:myRate(s.id),practiceLog:myLog(s.id)}:s);
+    if(curList==="vote"&&onlyUnvoted) all=all.filter(isFresh);
+    const q=$("#q").value.trim().toLowerCase();
     const ft=$("#f-tuning").value, fp=$("#f-preset").value, fk=$("#f-key").value, fr=$("#f-rate").value, fh=$("#f-reh").value, fv=$("#f-voc").value, sort=$("#sort").value;
     let list=all.filter(s=>{
       if(q && !(`${s.title} ${s.artist}`.toLowerCase().includes(q))) return false;
@@ -916,10 +989,10 @@ button.big{font-size:1rem;padding:12px 18px}
       voc:(a,b)=>vocRank(a)-vocRank(b)
     }[sort];
     if(cmp) list=list.slice().sort((a,b)=>cmp(a,b)||pos(a)-pos(b));
-    const fa=filtersActive(), canMove=!fa&&sort==="order"&&canWrite&&curList!=="vote";
+    const fa=filtersActive(), canMove=!fa&&sort==="order"&&canWrite&&curList!=="vote"&&curList!=="mine";
     const nActive=[$("#q").value.trim(),$("#f-tuning").value,$("#f-preset").value,$("#f-key").value,$("#f-rate").value,$("#f-reh").value,$("#f-voc").value].filter(Boolean).length+(sort!=="order"?1:0);
     $("#fcount").hidden=!nActive; $("#fcount").textContent=nActive;
-    $("#reorder-hint").hidden=canMove||!canWrite||!list.length;
+    $("#reorder-hint").hidden=canMove||!canWrite||!list.length||curList==="vote"||curList==="mine";
     const nReh=all.filter(x=>x.rehearsal).length;
     const L=LISTS.find(l=>l.id===curList);
     $("#count").textContent=loaded?(fa?`Показано ${list.length} з ${all.length}`:`${all.length} ${plural(all.length,"пісня","пісні","пісень")} · ${L.name}`)+(nReh?` · на репетицію: ${nReh}`:""):"Завантажую пісні…";
@@ -928,19 +1001,27 @@ button.big{font-size:1rem;padding:12px 18px}
     const today=todayStr();
     $("#songs").innerHTML=list.map(s=>{
       const p=pos(s), k=keyOf(s), r=rateOf(s), n=logOf(s).length, ds=daysSince(s), done=logOf(s).includes(today);
+      const band=P?songs.find(x=>x.id===s.id)||s:s, fresh=isFresh(s)&&curList==="vote";
+      const myR=myRate(s.id), myN=myLog(s.id).length, myDone=myLog(s.id).includes(today);
       const tags=[
         s.preset?`<span class="tag preset">${esc(s.preset)}${presetName(s.preset)?" "+esc(presetName(s.preset)):""}</span>`:"",
         `<span class="tag${tuningOf(s)!=="E"?" drop":""}">${esc(tuningOf(s))}</span>`,
         k?`<span class="tag shift">${k>0?"+":"−"}${Math.abs(k)}</span>`:"",
-        ...vocsOf(s).map(v=>`<span class="tag voc">${esc(v)}</span>`)
+        ...vocsOf(s).map(v=>`<span class="tag voc">${esc(v)}</span>`),
+        fresh?`<span class="tag fresh">Нова</span>`:"",
+        curList!=="vote"?tallyHtml(s.id):"",
+        P?`<span class="tag st">${esc(STATUS_NAME[statusOf(s)])}</span>`:""
       ].join("");
       const bpm=Number(s.bpm)>0?`<span class="bpm">${esc(s.bpm)}<small>BPM</small></span>`:`<span class="bpm none">—<small>BPM</small></span>`;
-      const prac=canWrite?`<label class="prac" data-noopen><input type="checkbox" data-prac="${esc(s.id)}" ${done?"checked":""} aria-label="Тренував сьогодні: ${esc(s.title)}">сьогодні</label>`:"<span></span>";
+      const bandPrac=!P&&["current","project"].includes(statusOf(s))?`<label class="prac" data-noopen title="Грали на репетиції сьогодні"><input type="checkbox" data-prac="${esc(s.id)}" ${done?"checked":""} aria-label="Грали на репетиції сьогодні: ${esc(s.title)}">реп.</label>`:"";
+      const myPrac=uKey()?`<label class="prac" data-noopen title="Я тренував сьогодні"><input type="checkbox" data-myprac="${esc(s.id)}" ${myDone?"checked":""} aria-label="Я тренував сьогодні: ${esc(s.title)}">я</label>`:"";
+      const prac=canWrite?`<span class="pracs">${bandPrac}${myPrac}</span>`:"<span></span>";
       const mv=canMove?`<div class="mv"><button type="button" data-mv="-1" data-id="${esc(s.id)}" aria-label="Вище" ${p===0?"disabled":""}>▲</button><button type="button" data-mv="1" data-id="${esc(s.id)}" aria-label="Нижче" ${p===all.length-1?"disabled":""}>▼</button></div>`:"<span></span>";
       const stale=ds===null||ds>=14;
-      return `<li class="row${r?" r"+r:""}${s.rehearsal?" on-reh":""}" tabindex="0" data-open="${esc(s.id)}"><span class="num">${p+1}</span>
+      const metaHtml=()=>`${P?`<span class="my">Моя</span>`:""}${starsHtml(r)}<span>${P?"Тренувань":"Репетицій"}: ${n}</span><span class="${stale?"stale":""}">${agoText(s)}</span>${P?(rateOf(band)?`<span>Гурт: ${"★".repeat(rateOf(band))}</span>`:""):(myR||myN?`<span class="my">Я: ${myR?"★".repeat(myR)+" · ":""}${myN} трен.</span>`:"")}`;
+      return `<li class="row${r?" r"+r:""}${s.rehearsal?" on-reh":""}${fresh?" fresh":""}" tabindex="0" data-open="${esc(s.id)}"><span class="num">${p+1}</span>
         <span class="ttl"><b>${esc(s.title||"Без назви")}</b><span>${esc(s.artist||"")}</span>
-          <span class="meta">${starsHtml(r)}<span>Тренувань: ${n}</span><span class="${stale?"stale":""}">${agoText(s)}</span></span>${linksHtml(s)}</span>
+          <span class="meta">${statusOf(s)==="vote"&&!P?`<span>Запропонував${s.addedBy?": "+esc(s.addedBy):"ли"}${s.voteSince?" · "+esc(String(s.voteSince).slice(0,10).split("-").reverse().join(".")):""}</span>`:metaHtml()}</span>${linksHtml(s)}</span>
         <span class="tags">${tags}</span>${bpm}${prac}${mv}</li>`;
     }).join("");
   }
@@ -977,6 +1058,7 @@ button.big{font-size:1rem;padding:12px 18px}
 
   $("#songs").addEventListener("change",e=>{
     const cb=e.target.closest("[data-prac]"); if(cb) togglePractice(cb.dataset.prac,cb.checked);
+    const mc=e.target.closest("[data-myprac]"); if(mc) toggleMyPractice(mc.dataset.myprac,mc.checked);
   });
   $("#songs").addEventListener("click",e=>{
     const lb=e.target.closest("[data-lyr]"); if(lb){ e.stopPropagation(); openLyrics(lb.dataset.lyr); return; }
@@ -984,7 +1066,8 @@ button.big{font-size:1rem;padding:12px 18px}
     const rb=e.target.closest("[data-reh]"); if(rb){ e.stopPropagation(); toggleReh(rb.dataset.reh); return; }
     const stb=e.target.closest("[data-st]"); if(stb){ e.stopPropagation(); setStatus(stb.dataset.st,stb.dataset.to); return; }
     const gb=e.target.closest("[data-gig]"); if(gb){ e.stopPropagation(); toggleGig(gb.dataset.gig); return; }
-    const vb=e.target.closest("[data-vote]"); if(vb){ e.stopPropagation(); toggleVote(vb.dataset.vote); return; }
+    const vb=e.target.closest("[data-cast]"); if(vb){ e.stopPropagation(); castVote(vb.dataset.id,vb.dataset.cast); return; }
+    const mb=e.target.closest("[data-mine]"); if(mb){ e.stopPropagation(); toggleMine(mb.dataset.mine); return; }
     if(e.target.closest("[data-noopen]")){ e.stopPropagation(); return; }
     const mv=e.target.closest("[data-mv]");
     if(mv){ e.stopPropagation(); moveInList(mv.dataset.id,Number(mv.dataset.mv)); return; }
@@ -997,16 +1080,66 @@ button.big{font-size:1rem;padding:12px 18px}
   $("#reset-filters").addEventListener("click",()=>{ ["#q","#f-tuning","#f-preset","#f-key","#f-rate","#f-reh","#f-voc"].forEach(s=>$(s).value=""); $("#sort").value="order"; renderList(); });
   try{ if(localStorage.getItem("filtersOpen")==="1") setFiltersOpen(true); }catch(_){}
 
-  $("#add-song").addEventListener("click",async()=>{
+  $("#add-song").addEventListener("click",()=>openAdd());
+  let addDest="vote";
+  function openAdd(){
     if(!db||!canWrite) return;
-    const order=songs.reduce((m,x)=>Math.max(m,Number(x.order)||0),0)+1;
-    const status=curList==="gig"?"current":curList;
-    const body={title:curList==="vote"?"Нова пропозиція":"Нова пісня",artist:"",order,status,tuning:"E",keyShift:0,bpm:"",preset:"",ctl:"",notes:"",sections:[],pdfs:[]};
-    if(curList==="gig"){ body.gig=true; body.gigOrder=inList("gig").length+1; }
-    if(curList==="vote"&&me) body.votes=[me];
-    try{ const ref=await db.collection("songs").add(body); songs.push({id:ref.id,...body}); openCard(ref.id); }
-    catch(e){ $("#count").textContent="Не вдалося додати пісню. Спробуй ще раз."; }
-  });
+    addDest=curList==="mine"?"mine":"vote";
+    let m=$("#add-modal"); if(!m){ m=document.createElement("div"); m.className="modal"; m.id="add-modal"; m.setAttribute("role","dialog"); m.setAttribute("aria-modal","true"); document.body.appendChild(m);
+      m.addEventListener("click",e=>{ if(e.target===m) m.hidden=true; }); }
+    m.hidden=false;
+    m.innerHTML=`<div class="modal-box add-box"><header class="modal-head"><h2>Нова пісня</h2><span class="grow"></span><button type="button" class="ghost" id="add-close" aria-label="Закрити">✕</button></header>
+      <div class="modal-body">
+        <div class="f">Куди додати<span class="dest"><button type="button" data-dest="vote">На голосування</button><button type="button" data-dest="mine">У моє тренування</button></span></div>
+        <form class="add-way" id="add-yt"><h3>З YouTube</h3><label class="f">Посилання на відео<input name="url" type="url" required placeholder="https://www.youtube.com/watch?v=…"></label>
+          <p class="note" style="margin:0">Назву, виконавця й посилання сайт візьме з відео. Акорди, структуру й BPM додаси потім у картці пісні.</p>
+          <span><button class="primary" type="submit">Додати з YouTube</button></span></form>
+        <form class="add-way" id="add-man"><h3>Вручну</h3><label class="f">Назва<input name="title" required></label><label class="f">Виконавець<input name="artist"></label>
+          <span><button type="submit">Додати</button></span></form>
+        <p class="status" id="add-status"></p>
+      </div></div>`;
+    const paint=()=>m.querySelectorAll("[data-dest]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.dest===addDest)));
+    m.querySelectorAll("[data-dest]").forEach(b=>b.onclick=()=>{ addDest=b.dataset.dest; paint(); }); paint();
+    $("#add-close").onclick=()=>{ m.hidden=true; };
+    $("#add-yt").onsubmit=async e=>{ e.preventDefault(); const url=String(new FormData(e.target).get("url")||"").trim(); const st=$("#add-status");
+      if(!/^https?:\/\/(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//i.test(url)){ st.className="status err"; st.textContent="Це не схоже на посилання YouTube."; return; }
+      st.className="status"; st.textContent="Читаю дані відео…";
+      const info=await ytInfo(url);
+      await createSong({...info},info.title?"":"Не вдалося прочитати назву з відео — впиши її в картці.");
+    };
+    $("#add-man").onsubmit=async e=>{ e.preventDefault(); const f=new FormData(e.target); await createSong({title:String(f.get("title")||"").trim(),artist:String(f.get("artist")||"").trim()}); };
+    setTimeout(()=>{ const i=m.querySelector("#add-yt input"); if(i) i.focus(); });
+  }
+  const CLEAN=/\s*[\(\[][^\)\]]*(official|video|audio|lyric|lyrics|hd|hq|4k|remaster|live|visuali[sz]er|music video|кліп|відео)[^\)\]]*[\)\]]/gi;
+  function parseYtTitle(t,author){
+    let x=String(t||"").replace(CLEAN,"").replace(/\s*\|.*$/,"").replace(/\s+(official\s+)?(music\s+)?video\s*$/i,"").trim();
+    const lesson=/(lesson|tutorial|how to play|урок|розбір|разбор|guitar cover|на гітарі)/i.test(t||"");
+    const m=/^(.+?)\s+[-–—]\s+(.+)$/.exec(x);
+    let artist="", title=x;
+    if(m){ artist=m[1].trim(); title=m[2].trim(); }
+    else if(author){ artist=String(author).replace(/\s*-\s*Topic$/i,"").replace(/VEVO$/i,"").trim(); }
+    title=title.replace(/^["“«]|["”»]$/g,"").trim();
+    return {artist,title,lesson};
+  }
+  async function ytInfo(url){
+    const tries=[`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(url)}`,`https://noembed.com/embed?url=${encodeURIComponent(url)}`];
+    for(const u of tries){ try{ const r=await fetch(u); if(!r.ok) continue; const j=await r.json(); if(j&&j.title){ const p=parseYtTitle(j.title,j.author_name); return p.lesson?{lessonUrl:url,title:p.title,artist:p.artist}:{songUrl:url,title:p.title,artist:p.artist}; } }catch(_){} }
+    return {songUrl:url,title:"",artist:""};
+  }
+  async function createSong(info,note){
+    const st=$("#add-status");
+    const order=songs.reduce((m,x)=>Math.max(m,Number(x.order)||0),0)+1, now=new Date().toISOString();
+    const body={title:info.title||"Нова пісня",artist:info.artist||"",order,status:addDest==="vote"?"vote":"solo",tuning:"E",keyShift:0,bpm:"",preset:"",ctl:"",notes:"",sections:[],pdfs:[],
+      songUrl:info.songUrl||"",lessonUrl:info.lessonUrl||"",addedBy:me||"",created:now};
+    if(addDest==="vote") body.voteSince=now; else body.owner=uKey();
+    try{
+      const ref=await db.collection("songs").add(body); if(!songs.some(x=>x.id===ref.id)) songs.push({id:ref.id,...body});
+      if(addDest==="mine") await saveMine(ref.id,{list:true});
+      else await castVote(ref.id,"up");
+      $("#add-modal").hidden=true; curList=addDest; try{localStorage.setItem("songList",curList)}catch(_){}
+      openCard(ref.id); if(note) renderCard(note,"err");
+    }catch(e){ st.className="status err"; st.textContent="Не вдалося додати пісню. Спробуй ще раз."; }
+  }
 
   // card
   function openCard(id){
@@ -1075,19 +1208,40 @@ button.big{font-size:1rem;padding:12px 18px}
         <p class="note">Посилання відкриваються в новій вкладці або в застосунку, тож пісня грає паралельно зі сторінкою. Встав посилання на конкретне відео, щоб замінити пошук. Після зміни натисни «Зберегти».</p>
       </section>
       <section class="block">
-        <div class="block-head"><h3>Готовність</h3><span class="muted">${rateOf(d)?`${rateOf(d)} з 5 — ${RATE_LABEL[rateOf(d)]}`:"Ще без оцінки"}</span></div>
+        <div class="block-head"><h3>Готовність гурту</h3><span class="muted">${rateOf(d)?`${rateOf(d)} з 5 — ${RATE_LABEL[rateOf(d)]}`:"Ще без оцінки"}</span></div>
         <div class="rate" role="group" aria-label="Готовність від 1 до 5">
           ${[1,2,3,4,5].map(v=>`<button type="button" class="v${v}" data-rate="${v}" aria-pressed="${rateOf(d)===v}" title="${RATE_LABEL[v]}" ${ro?"disabled":""}>${v}</button>`).join("")}
           ${!ro&&rateOf(d)?`<button type="button" class="ghost" data-rate="0">Скинути</button>`:""}
         </div>
       </section>
       <section class="block">
-        <div class="block-head"><h3>Тренування</h3></div>
+        <div class="block-head"><h3>Репетиції гурту</h3></div>
         <div class="practice">
-          <span><span class="big">${logOf(d).length}</span> <span class="muted">${plural(logOf(d).length,"тренування","тренування","тренувань")}</span></span>
-          <span>Останнє: <b>${lastOf(d)?lastOf(d).split("-").reverse().join(".")+" · "+agoText(d):"ще не було"}</b></span>
-          ${ro?"":`<label><input type="checkbox" id="c-prac" ${logOf(d).includes(todayStr())?"checked":""}>Тренував сьогодні</label>`}
+          <span><span class="big">${logOf(d).length}</span> <span class="muted">${plural(logOf(d).length,"репетиція","репетиції","репетицій")}</span></span>
+          <span>Остання: <b>${lastOf(d)?lastOf(d).split("-").reverse().join(".")+" · "+agoText(d):"ще не було"}</b></span>
+          ${ro?"":`<label><input type="checkbox" id="c-prac" ${logOf(d).includes(todayStr())?"checked":""}>Грали на репетиції сьогодні</label>`}
         </div>
+      </section>
+      ${uKey()?(()=>{ const mr=myRate(openId), ml=myLog(openId), mo={practiceLog:ml}, inM=inMine(songs.find(x=>x.id===openId)||d);
+        return `<section class="block">
+        <div class="block-head"><h3>Моє тренування</h3><span class="muted">${inM?"У твоєму списку":"Не в твоєму списку"} · бачиш лише ти</span></div>
+        <div class="rate" role="group" aria-label="Моя готовність від 1 до 5">
+          ${[1,2,3,4,5].map(v=>`<button type="button" class="v${v}" data-myrate="${v}" aria-pressed="${mr===v}" title="${RATE_LABEL[v]}" ${ro?"disabled":""}>${v}</button>`).join("")}
+          ${!ro&&mr?`<button type="button" class="ghost" data-myrate="0">Скинути</button>`:""}
+          <span class="muted" style="align-self:center">${mr?`Моя готовність: ${RATE_LABEL[mr]}`:"Моя готовність ще без оцінки"}</span>
+        </div>
+        <div class="practice">
+          <span><span class="big">${ml.length}</span> <span class="muted">${plural(ml.length,"тренування","тренування","тренувань")}</span></span>
+          <span>Останнє: <b>${lastOf(mo)?lastOf(mo).split("-").reverse().join(".")+" · "+agoText(mo):"ще не було"}</b></span>
+          ${ro?"":`<label><input type="checkbox" id="c-myprac" ${ml.includes(todayStr())?"checked":""}>Тренував сьогодні</label>`}
+          ${ro||statusOf(d)==="solo"?"":`<button type="button" id="c-mine">${inM?"Прибрати з мого списку":"Додати в моє тренування"}</button>`}
+        </div>
+      </section>`; })():""}
+      <section class="block">
+        <div class="block-head"><h3>Голосування</h3>${tallyHtml(openId)||`<span class="muted">Ще ніхто не голосував</span>`}</div>
+        ${ro?"":`<span class="vote-box">${voteBtns(openId)}</span>`}
+        ${votesFor(openId).length?`<p class="muted" style="margin:0">${esc(votesFor(openId).map(x=>`${x.name}: ${VOTE_NAME[x.v]}`).join(" · "))}</p>`:""}
+        ${statusOf(d)==="solo"&&!ro?`<span><button type="button" data-st-card="vote">Винести на голосування гурту</button></span>`:""}
       </section>
       <section class="block">
         <div class="block-head"><h3>Структура й акорди</h3>
@@ -1127,6 +1281,11 @@ button.big{font-size:1rem;padding:12px 18px}
     const pos=$("#c-pos"); if(pos) pos.addEventListener("input",setDirty);
     document.querySelectorAll("[data-rate]").forEach(b=>b.addEventListener("click",()=>setRating(openId,Number(b.dataset.rate))));
     const pr=$("#c-prac"); if(pr) pr.addEventListener("change",()=>togglePractice(openId,pr.checked));
+    const mp=$("#c-myprac"); if(mp) mp.addEventListener("change",()=>toggleMyPractice(openId,mp.checked));
+    const cm=$("#c-mine"); if(cm) cm.onclick=()=>toggleMine(openId);
+    document.querySelectorAll("#card-view [data-myrate]").forEach(b=>b.addEventListener("click",()=>setMyRating(openId,Number(b.dataset.myrate))));
+    document.querySelectorAll("#card-view [data-cast]").forEach(b=>b.addEventListener("click",()=>castVote(openId,b.dataset.cast)));
+    document.querySelectorAll("#card-view [data-st-card]").forEach(b=>b.addEventListener("click",async()=>{ if(dirty) await saveCard(); await setStatus(openId,b.dataset.stCard); draft.status=b.dataset.stCard; draft.voteSince=songs.find(x=>x.id===openId).voteSince; renderCard("Пісню винесено на голосування","ok"); }));
     document.querySelectorAll(".part").forEach(row=>{
       const i=Number(row.dataset.i);
       row.querySelectorAll("[data-sf]").forEach(el=>el.addEventListener("input",()=>{draft.sections[i][el.dataset.sf]=el.value; setDirty();}));
@@ -1161,7 +1320,7 @@ button.big{font-size:1rem;padding:12px 18px}
   function bodyFrom(d){
     return {title:d.title||"",artist:d.artist||"",order:d.order,tuning:d.tuning||"E",keyShift:Number(d.keyShift||0),bpm:String(d.bpm||""),
       preset:d.preset||"",ctl:d.ctl||"",notes:d.notes||"",rating:rateOf(d),practiceLog:logOf(d),
-      lessonUrl:safeUrl(d.lessonUrl),songUrl:safeUrl(d.songUrl),ugUrl:safeUrl(d.ugUrl),lyrics:String(d.lyrics||""),lyricsUrl:safeUrl(d.lyricsUrl),rehearsal:!!d.rehearsal,vocals:vocsOf(d),status:statusOf(d),gig:!!d.gig&&statusOf(d)==="current",gigOrder:d.gigOrder??null,votes:votesOf(d),
+      lessonUrl:safeUrl(d.lessonUrl),songUrl:safeUrl(d.songUrl),ugUrl:safeUrl(d.ugUrl),lyrics:String(d.lyrics||""),lyricsUrl:safeUrl(d.lyricsUrl),rehearsal:!!d.rehearsal,vocals:vocsOf(d),status:statusOf(d),gig:!!d.gig&&statusOf(d)==="current",gigOrder:d.gigOrder??null,votes:votesOf(d),owner:d.owner||"",voteSince:d.voteSince||"",addedBy:d.addedBy||"",created:d.created||"",
       sections:(d.sections||[]).map(p=>({name:p.name||"",chords:p.chords||"",note:p.note||""})),
       pdfs:(d.pdfs||[]).map(f=>({id:f.id,name:f.name||""}))};
   }
@@ -1169,7 +1328,7 @@ button.big{font-size:1rem;padding:12px 18px}
     const st=$("#status"); if(st){st.textContent="Зберігаю…"; st.className="status";}
     try{
       const cur=songs.find(s=>s.id===openId); draft.order=cur?cur.order:draft.order;
-      if(cur){ draft.votes=votesOf(cur); draft.gig=!!cur.gig; draft.gigOrder=cur.gigOrder??null; }
+      if(cur){ draft.votes=votesOf(cur); draft.gig=!!cur.gig; draft.gigOrder=cur.gigOrder??null; draft.voteSince=cur.voteSince||""; if(statusOf(draft)==="vote"&&statusOf(cur)!=="vote") draft.voteSince=new Date().toISOString(); if(statusOf(draft)==="solo"&&!draft.owner) draft.owner=uKey(); }
       const body=bodyFrom(draft);
       await db.doc("songs/"+openId).set(body);
       Object.assign(cur,body);
@@ -1692,9 +1851,12 @@ button.big{font-size:1rem;padding:12px 18px}
   // ---------- song lists ----------
   function renderLists(){
     const n=id=>inList(id).length;
-    $("#lists").innerHTML=LISTS.map(l=>`<button type="button" data-list="${l.id}" aria-pressed="${l.id===curList}">${esc(l.name)}<span class="n">${loaded?n(l.id):""}</span></button>`).join("");
-    const L=LISTS.find(l=>l.id===curList); $("#list-about").textContent=L.about;
-    $("#add-song").textContent=curList==="vote"?"+ Запропонувати":"+ Пісня";
+    const nFresh=songs.filter(isFresh).length;
+    $("#lists").innerHTML=LISTS.map(l=>`<button type="button" class="${l.id==="mine"?"mine":""}" data-list="${l.id}" aria-pressed="${l.id===curList}">${esc(l.name)}<span class="n">${loaded?n(l.id):""}</span>${l.id==="vote"&&nFresh?`<span class="dot" title="Без твого голосу: ${nFresh}">${nFresh}</span>`:""}</button>`).join("");
+    const L=LISTS.find(l=>l.id===curList);
+    $("#list-about").innerHTML=`<span>${esc(L.about)}</span>`+(curList==="vote"?`<label class="unvoted"><input type="checkbox" id="only-unvoted" ${onlyUnvoted?"checked":""}>Лише без мого голосу${nFresh?` (${nFresh})`:""}</label>`:"");
+    if($("#only-unvoted")) $("#only-unvoted").onchange=e=>{ onlyUnvoted=e.target.checked; renderList(); };
+    $("#add-song").textContent="+ Пісня";
     renderGigHead();
   }
   $("#lists").addEventListener("click",e=>{ const b=e.target.closest("[data-list]"); if(!b) return; curList=b.dataset.list; try{localStorage.setItem("songList",curList)}catch(_){} renderList(); });
@@ -1727,8 +1889,10 @@ button.big{font-size:1rem;padding:12px 18px}
     const s=songs.find(x=>x.id===id); if(!s||!db) return;
     const order=songs.reduce((m,x)=>Math.max(m,Number(x.order)||0),0)+1;
     const patch={status:to,order}; if(to!=="current"){ patch.gig=false; patch.gigOrder=null; }
+    if(to==="vote"&&statusOf(s)!=="vote") patch.voteSince=new Date().toISOString();
     const prev={status:s.status,order:s.order,gig:s.gig,gigOrder:s.gigOrder}; Object.assign(s,patch); renderList();
-    try{ await db.doc("songs/"+id).update(patch); }catch(_){ Object.assign(s,prev); renderList(); }
+    const wasSolo=prev.status==="solo";
+    try{ await db.doc("songs/"+id).update(patch); if(to==="vote"&&wasSolo&&!myVote(id)) await castVote(id,"up"); }catch(_){ Object.assign(s,prev); renderList(); }
   }
   async function toggleGig(id){
     const s=songs.find(x=>x.id===id); if(!s||!db) return;
@@ -1736,6 +1900,13 @@ button.big{font-size:1rem;padding:12px 18px}
     const prev={gig:s.gig,gigOrder:s.gigOrder}; Object.assign(s,patch); renderList();
     try{ await db.doc("songs/"+id).update(patch); }catch(_){ Object.assign(s,prev); renderList(); }
   }
+  async function toggleMine(id){ const s=songs.find(x=>x.id===id); if(!s) return; await saveMine(id,{list:!inMine(s)}); }
+  async function toggleMyPractice(id,on){
+    const t=todayStr(); let log=myLog(id);
+    if(on&&!log.includes(t)) log=[...log,t]; if(!on) log=log.filter(x=>x!==t);
+    await saveMine(id,{log});
+  }
+  async function setMyRating(id,val){ await saveMine(id,{rating:val}); }
   async function toggleVote(id){
     const s=songs.find(x=>x.id===id); if(!s||!db||!me) return;
     const v=votesOf(s), votes=v.includes(me)?v.filter(x=>x!==me):[...v,me];
@@ -1824,7 +1995,7 @@ button.big{font-size:1rem;padding:12px 18px}
   route();
 
   // ---------- data backup / import ----------
-  const COLLS=["songs","presets","lessons","comments","library","sections","meta"];
+  const COLLS=["songs","presets","lessons","comments","library","sections","meta","mine","votes"];
   $("#data-export").onclick=async()=>{
     const st=$("#data-status"); if(!db){ st.textContent="Спершу увійди на сайт."; return; }
     st.className="status"; st.textContent="Збираю дані…";
@@ -1882,6 +2053,8 @@ button.big{font-size:1rem;padding:12px 18px}
       cheat=snap.exists?JSON.parse(JSON.stringify(snap.data())):null; cheatLoaded=true;
       if(!$("#cheat-modal").hidden&&!cheatEdit) renderCheat();
     },()=>{ cheatLoaded=true; });
+    db.collection("mine").onSnapshot(snap=>{ mineDocs=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))})); refreshSongs(); },()=>{});
+    db.collection("votes").onSnapshot(snap=>{ voteDocs=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))})); refreshSongs(); },()=>{});
     db.collection("sections").onSnapshot(snap=>{
       secs=snap.docs.map(d=>({id:d.id,...JSON.parse(JSON.stringify(d.data()))})); secsLoaded=true;
       if(!secEdit&&!secAdd) renderSec();
